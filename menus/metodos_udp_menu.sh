@@ -78,6 +78,10 @@ menu_metodos_udp() {
             1|01) abrir_udp_hysteria ;;
             2|02) abrir_udp_custom ;;
             3|03) abrir_zivpn ;;
+            6|06)
+                bash /opt/darkzsaid/menus/udpmod_users_menu.sh
+            ;;
+
             0|00) return ;;
             *) opcion_invalida ;;
         esac

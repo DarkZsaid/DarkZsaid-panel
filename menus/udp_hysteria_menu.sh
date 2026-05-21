@@ -186,6 +186,7 @@ menu_udp_hysteria() {
         echo -e "${ROJO}[03]${RESET} ${CYAN}➜${RESET} ${BLANCO}REINICIAR${RESET}"
         echo -e "${ROJO}[04]${RESET} ${CYAN}➜${RESET} ${BLANCO}DATOS / PUERTO${RESET}"
         echo -e "${ROJO}[05]${RESET} ${CYAN}➜${RESET} ${ROJO}REMOVER${RESET}"
+        echo -e "${ROJO}[06]${RESET} ${AZUL}USUARIOS UDPMOD${RESET}"
         echo ""
         echo -e "${ROJO}[00]${RESET} ${CYAN}➜${RESET} ${ROJO}[ VOLVER ]${RESET}"
         echo ""
@@ -198,6 +199,10 @@ menu_udp_hysteria() {
             3|03) reiniciar_udpmod ;;
             4|04) datos_udpmod ;;
             5|05) remover_udpmod ;;
+            6|06)
+                bash /opt/darkzsaid/menus/udpmod_users_menu.sh
+            ;;
+
             0|00) return ;;
             *) echo -e "${ROJO}Opción inválida.${RESET}"; sleep 1 ;;
         esac
