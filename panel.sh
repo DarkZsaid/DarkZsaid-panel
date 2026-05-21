@@ -84,7 +84,7 @@ mostrar_puertas_activas_panel() {
     ss -tulnp 2>/dev/null | grep -qE '(:7200[[:space:]]|:7200$)' && PUERTO_BADVPN1="${VERDE}ON${RESET}"
     ss -tulnp 2>/dev/null | grep -qE '(:7300[[:space:]]|:7300$)' && PUERTO_BADVPN2="${VERDE}ON${RESET}"
 
-    RAYA="${CYAN}◆══════════════════════════════════════════════◆${RESET}"
+RAYA="${CYAN}◆════════════════════════════════════════════════◆${RESET}"
 
     echo -e "${CYAN}"
 cat <<'LOGO'
@@ -101,10 +101,10 @@ echo -e "${RESET}"
     echo ""
 
     echo -e "$RAYA"
-    echo -e "${CYAN} ◈${RESET} SO:    ${BLANCO}${SO_INFO}${RESET}        ${CYAN}◈${RESET} IP: ${BLANCO}${IP_INFO}${RESET}"
-    echo -e "${CYAN} ◈${RESET} CPU:   ${BLANCO}${CPU_INFO} cores${RESET}              ${CYAN}◈${RESET} Fecha: ${BLANCO}${FECHA_INFO}${RESET}"
-    echo -e "${CYAN} ◈${RESET} RAM:   ${BLANCO}${RAM_INFO}${RESET}                 ${CYAN}◈${RESET} Uptime: ${BLANCO}${UPTIME_INFO}${RESET}"
-    echo -e "$RAYA"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET} ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${AMARILLO}${IP_INFO}${RESET}"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}      ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${AMARILLO}${FECHA_INFO}${RESET}"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}RAM:${RESET} ${BLANCO}${RAM_INFO}${RESET}"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}Up:${RESET} ${BLANCO}${UPTIME_INFO}${RESET}"
 
     [[ -n "$PUERTO_SSH" ]] && echo -e "${CYAN} ◈${RESET} SSH:22 ${CYAN}◆${RESET} $PUERTO_SSH        ${CYAN}◈${RESET} DNS:53 ${CYAN}◆${RESET} ${PUERTO_DNS:-${ROJO}OFF${RESET}}"
     [[ -n "$PUERTO_SOCKS" ]] && echo -e "${CYAN} ◈${RESET} SOCKS:80 ${CYAN}◆${RESET} $PUERTO_SOCKS"
@@ -2372,9 +2372,9 @@ remover_ssh_ws_permanente() {
 
 instalar_sockpython_200_establish() {
     clear
-    echo -e "${ROJO}════════════════════════════════════════════${RESET}"
+        echo -e "$RAYA"
     echo -e "${BLANCO}${BOLD}   SOCKS PYTHON DIRECTO OS / 200 ESTABLISH ADM SJCC - 200 ESTABLISH  ${RESET}"
-    echo -e "${ROJO}════════════════════════════════════════════${RESET}"
+        echo -e "$RAYA"
     echo ""
 
     echo -e "${CYAN}Configurando método WebSocket puerto 80...${RESET}"
@@ -2444,56 +2444,158 @@ EOSERVICE
 
 
 # =========================================================
-# MENU PRINCIPAL FINAL LIMPIO - DARKZSAID v1.0
+# 
+estado_zivpn_panel() {
+    if systemctl is-active --quiet zivpn 2>/dev/null || ss -H -ulnp 2>/dev/null | grep -q ":5667" || pgrep -af "zivpn" >/dev/null 2>&1; then
+        echo -e "${CYAN}ON${RESET}"
+    else
+        echo -e "${ROJO}OFF${RESET}"
+    fi
+}
+
+estado_udp_panel() {
+    if ss -H -ulnp 2>/dev/null | grep -q ":36712" || pgrep -af "udp-custom|udpmod|udp-hysteria|hysteria" >/dev/null 2>&1; then
+        echo -e "${CYAN}ON${RESET}"
+    else
+        echo -e "${ROJO}OFF${RESET}"
+    fi
+}
+
+nombre_udp_panel() {
+    local custom=0
+    local hyst=0
+
+    systemctl is-active --quiet udp-custom 2>/dev/null && custom=1
+    systemctl is-active --quiet udpmod 2>/dev/null && hyst=1
+    systemctl is-active --quiet udp-hysteria 2>/dev/null && hyst=1
+
+    pgrep -af "udp-custom" >/dev/null 2>&1 && custom=1
+    pgrep -af "udpmod|udp-hysteria|hysteria" >/dev/null 2>&1 && hyst=1
+
+    if [[ "$custom" == "1" && "$hyst" == "1" ]]; then
+        echo "UDP:CUST+HYST"
+    elif [[ "$custom" == "1" ]]; then
+        echo "UDP:CUSTOM"
+    elif [[ "$hyst" == "1" ]]; then
+        echo "UDP:HYST"
+    else
+        echo "UDP:36712"
+    fi
+}
+
+MENU PRINCIPAL FINAL LIMPIO - DARKZSAID v1.0
 # =========================================================
 
 menu_principal() {
     while true; do
         clear
 
-        ROJO="\e[1;31m"
-        VERDE="\e[1;32m"
-        AMARILLO="\e[1;33m"
-        AZUL="\e[1;34m"
-        CYAN="\e[1;36m"
-        BLANCO="\e[1;97m"
-        RESET="\e[0m"
+        # Logo superior
+        if [[ -f /etc/darkzsaid/panel_logo.conf ]]; then
+            source /etc/darkzsaid/panel_logo.conf
+        fi
 
-        PANEL_AUTHOR="@DarkZsaid"
-        PANEL_VERSION="v1.0"
-
-        [[ -f /etc/darkzsaid/panel_logo.conf ]] && source /etc/darkzsaid/panel_logo.conf 2>/dev/null || true
         PANEL_LOGO_TEXT="${PANEL_LOGO_TEXT:-DarkZsaid}"
-
-        SO_INFO="$(lsb_release -ds 2>/dev/null | tr -d '"' || echo Ubuntu)"
-        IP_INFO="$(curl -s --max-time 2 ifconfig.me 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}')"
-        CPU_INFO="$(nproc 2>/dev/null || echo 1)"
-        FECHA_INFO="$(date '+%d/%m/%Y-%H:%M')"
-        RAM_INFO="$(free -m | awk '/Mem:/ {print $3"Mi"}')"
-        UPTIME_INFO="$(uptime -p 2>/dev/null | sed 's/up //')"
-
-        RAYA="${CYAN}◆══════════════════════════════════════════════◆${RESET}"
+        PANEL_VERSION="${PANEL_VERSION:-v1.0}"
+        PANEL_AUTHOR="@DarkZsaid"
 
         echo -e "${CYAN}"
-                toilet -f big "$PANEL_LOGO_TEXT" 2>/dev/null | sed "/^[[:space:]]*$/d" || figlet "$PANEL_LOGO_TEXT" 2>/dev/null | sed "/^[[:space:]]*$/d" || echo "========== $PANEL_LOGO_TEXT =========="
+        toilet -f big "$PANEL_LOGO_TEXT" 2>/dev/null | sed '/^[[:space:]]*$/d' || figlet "$PANEL_LOGO_TEXT" 2>/dev/null | sed '/^[[:space:]]*$/d' || echo "$PANEL_LOGO_TEXT"
         echo -e "${RESET}"
+
+RAYA="${CYAN}◆════════════════════════════════════════════════◆${RESET}"
+
         echo -e "$RAYA"
-        echo -e "${BLANCO} ⚡ Gestor VPN/SSH by ${CYAN}${PANEL_AUTHOR}${RESET}  ${AMARILLO}◆ ${PANEL_VERSION}${RESET}"
-        echo -e "$RAYA"
+        printf "%b\n" "${BLANCO}⚡ Gestor VPN/SSH by ${CYAN}${PANEL_AUTHOR}${RESET} ${AMARILLO}◆ ${PANEL_VERSION}${RESET}"
         echo -e "$RAYA"
 
-        echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET}     ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${AMARILLO}${IP_INFO}${RESET}"
-        echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}          ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${AMARILLO}${FECHA_INFO}${RESET}"
-        echo -e "${CYAN} ◈${RESET} ${CYAN}RAM:${RESET} ${BLANCO}${RAM_INFO}${RESET}"
-        echo -e "${CYAN} ◈${RESET} ${CYAN}Up:${RESET} ${BLANCO}${UPTIME_INFO}${RESET}"
+        # Datos del sistema
+        SO_INFO=$(lsb_release -ds 2>/dev/null | tr -d '"' || echo "Ubuntu")
+        IP_INFO=$(curl -s --max-time 3 ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+        CPU_INFO=$(nproc 2>/dev/null || echo "1")
+        RAM_INFO=$(free -m | awk '/Mem:/ {print $7"Mi"}')
+        FECHA_INFO=$(date '+%d/%m/%Y-%H:%M')
+        UPTIME_INFO=$(uptime -p | sed 's/up //')
+
+        echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET} ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${AMARILLO}${IP_INFO}${RESET}"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}      ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${AMARILLO}${FECHA_INFO}${RESET}"
+        printf "%b\n" "${CYAN} ◈ RAM:${RESET} ${BLANCO}${RAM_INFO}${RESET}"
+        printf "%b\n" "${CYAN} ◈ Up:${RESET} ${BLANCO}${UPTIME_INFO}${RESET}"
         echo -e "$RAYA"
 
-        ss -tulnp 2>/dev/null | grep -qE '(:22[[:space:]]|:22$)' && echo -e "${CYAN} ◈${RESET} ${BLANCO}SSH:22${RESET} ${CYAN}◆${RESET} ${CYAN}ON${RESET}        ${CYAN}◈${RESET} ${BLANCO}DNS:53${RESET} ${CYAN}◆${RESET} ${CYAN}ON${RESET}"
-        ss -tulnp 2>/dev/null | grep -qE '(:80[[:space:]]|:80$)' && echo -e "${CYAN} ◈${RESET} ${BLANCO}SOCKS:80${RESET} ${CYAN}◆${RESET} ${CYAN}ON${RESET}"
-        ss -tulnp 2>/dev/null | grep -qE '(:443[[:space:]]|:443$)' && echo -e "${CYAN} ◈${RESET} ${BLANCO}SSL:443${RESET} ${CYAN}◆${RESET} ${CYAN}ON${RESET}"
-        ss -tulnp 2>/dev/null | grep -qE '(:36712[[:space:]]|:36712$)' && echo -e "${CYAN} ◈${RESET} ${BLANCO}UDP:36712${RESET} ${CYAN}◆${RESET} ${CYAN}ON${RESET}"
-        ss -tulnp 2>/dev/null | grep -qE '(:5667[[:space:]]|:5667$)' && echo -e "${CYAN} ◈${RESET} ${BLANCO}ZIVPN:5667${RESET} ${CYAN}◆${RESET} ${CYAN}ON${RESET}"
-        ss -tulnp 2>/dev/null | grep -qE '(:7300[[:space:]]|:7300$)' && echo -e "${CYAN} ◈${RESET} ${BLANCO}BadVPN:7300${RESET} ${CYAN}◆${RESET} ${CYAN}ON${RESET}"
+        # Mostrar SOLO puertos activos
+        PUERTOS_LINEAS=()
+
+        puerto_activo() {
+            local port="$1"
+            ss -H -tulnp 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"
+        }
+
+        puerto_udp_activo() {
+            local port="$1"
+            ss -H -ulnp 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"
+        }
+
+        if puerto_activo 22; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SSH:22${RESET} ${CYAN}◆ ON${RESET}")
+        fi
+
+        if puerto_activo 53; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}DNS:53${RESET} ${CYAN}◆ ON${RESET}")
+        fi
+
+        if puerto_activo 80; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SOCKS:80${RESET} ${CYAN}◆ ON${RESET}")
+        fi
+
+        if puerto_activo 443; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SSL:443${RESET} ${CYAN}◆ ON${RESET}")
+        fi
+
+        UDP_CUSTOM_ON=0
+        UDP_HYST_ON=0
+
+        systemctl is-active --quiet udp-custom 2>/dev/null && UDP_CUSTOM_ON=1
+        systemctl is-active --quiet udpmod 2>/dev/null && UDP_HYST_ON=1
+        systemctl is-active --quiet udp-hysteria 2>/dev/null && UDP_HYST_ON=1
+
+        pgrep -af "udp-custom" >/dev/null 2>&1 && UDP_CUSTOM_ON=1
+        pgrep -af "udpmod|udp-hysteria|hysteria" >/dev/null 2>&1 && UDP_HYST_ON=1
+
+        if [[ "$UDP_CUSTOM_ON" == "1" ]]; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}UDP:CUSTOM${RESET} ${CYAN}◆ ON${RESET}")
+        elif [[ "$UDP_HYST_ON" == "1" ]]; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}UDP:HYST${RESET} ${CYAN}◆ ON${RESET}")
+        elif puerto_udp_activo 36712; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}UDP:36712${RESET} ${CYAN}◆ ON${RESET}")
+        fi
+
+        if systemctl is-active --quiet zivpn 2>/dev/null || puerto_udp_activo 5667 || pgrep -af "zivpn" >/dev/null 2>&1; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}ZIVPN:5667${RESET} ${CYAN}◆ ON${RESET}")
+        fi
+
+        if pgrep -af "badvpn|udpgw" >/dev/null 2>&1 || puerto_activo 7300 || puerto_activo 7200; then
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}BadVPN:7300${RESET} ${CYAN}◆ ON${RESET}")
+        fi
+
+        i=0
+        total=${#PUERTOS_LINEAS[@]}
+        while [[ $i -lt $total ]]; do
+            left="${PUERTOS_LINEAS[$i]}"
+            right=""
+
+            if [[ $((i+1)) -lt $total ]]; then
+                right="${PUERTOS_LINEAS[$((i+1))]}"
+            fi
+
+            if [[ -n "$right" ]]; then
+                printf "%b\n" "${left}        ${right}"
+            else
+                printf "%b\n" "${left}"
+            fi
+
+            i=$((i+2))
+        done
 
         echo -e "$RAYA"
 
@@ -2506,6 +2608,7 @@ menu_principal() {
         printf "%b\n" "${BLANCO}<08>${RESET} 💻 ${AMARILLO}ACTUALIZAR${RESET}      ${BLANCO}<9>${RESET} 🗑 ${ROJO}DESINSTALAR${RESET}"
         printf "%b\n" "${BLANCO}<99>${RESET} 🔄 ${AMARILLO}REBOOT${RESET}"
         echo -e "$RAYA"
+
         printf "%b\n" "${BLANCO}<0>${RESET} ❌ ${ROJO}SALIR${RESET}"
         echo -e "$RAYA"
         echo ""
@@ -2516,6 +2619,8 @@ menu_principal() {
             1|01)
                 if [[ -f /opt/darkzsaid/menus/users_menu.sh ]]; then
                     bash /opt/darkzsaid/menus/users_menu.sh
+                elif declare -F users_menu >/dev/null; then
+                    users_menu
                 elif declare -F menu_usuarios >/dev/null; then
                     menu_usuarios
                 else
@@ -2525,14 +2630,23 @@ menu_principal() {
             ;;
 
             2|02)
-                bash /opt/darkzsaid/menus/protocolos_menu_completo.sh
+                if declare -F menu_instaladores >/dev/null; then
+                    menu_instaladores
+                elif [[ -f /opt/darkzsaid/menus/protocolos_menu_completo.sh ]]; then
+                    bash /opt/darkzsaid/menus/protocolos_menu_completo.sh
+                elif [[ -f /opt/darkzsaid/menus/metodos_udp_menu.sh ]]; then
+                    bash /opt/darkzsaid/menus/metodos_udp_menu.sh
+                else
+                    echo "No se encontró menú de protocolos."
+                    read -p "ENTER..."
+                fi
             ;;
 
             3|03)
                 if declare -F menu_herramientas >/dev/null; then
                     menu_herramientas
                 else
-                    echo "No se encontró menú herramientas."
+                    echo "No se encontró menú de herramientas."
                     read -p "ENTER..."
                 fi
             ;;
@@ -2541,7 +2655,7 @@ menu_principal() {
                 if declare -F menu_puertos >/dev/null; then
                     menu_puertos
                 else
-                    echo "No se encontró menú puertos."
+                    echo "No se encontró menú de puertos."
                     read -p "ENTER..."
                 fi
             ;;
@@ -2556,14 +2670,19 @@ menu_principal() {
             ;;
 
             7|07)
-                bash /opt/darkzsaid/menus/configurar_nombre_panel.sh
+                bash /opt/darkzsaid/menus/configurar_nombre_panel.sh 2>/dev/null || {
+                    echo "No se encontró configurador de logo."
+                    read -p "ENTER..."
+                }
             ;;
 
             8|08)
-                bash /opt/darkzsaid/darkzsaid-update.sh 2>/dev/null || {
+                if [[ -f /opt/darkzsaid/darkzsaid-update.sh ]]; then
+                    bash /opt/darkzsaid/darkzsaid-update.sh
+                else
                     echo "Actualizador no encontrado."
                     read -p "ENTER..."
-                }
+                fi
             ;;
 
             9|09)
@@ -2589,6 +2708,5 @@ menu_principal() {
         esac
     done
 }
-
 menu_principal
 
