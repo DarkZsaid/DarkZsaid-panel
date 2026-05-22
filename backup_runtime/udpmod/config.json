@@ -5,9 +5,10 @@
   "obfs": "DarkZsaid",
   "auth": {
     "mode": "passwords",
-    "config": [
-      "steven:2026"
-    ]
+    "config": []
   },
-  "disable_udp": false
+  "disable_udp": false,
+  "alpn": "",
+  "up_mbps": 17,
+  "down_mbps": 15
 }

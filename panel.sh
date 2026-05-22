@@ -59,6 +59,10 @@ mostrar_puertas_activas_panel() {
 
     [[ -f /etc/darkzsaid/panel_theme.conf ]] && source /etc/darkzsaid/panel_theme.conf 2>/dev/null || true
 
+    echo -e "${CIAN}${BOLD}        DARKZSAID${RESET}"
+    echo -e "${BLANCO}${BOLD}     SCRIPT PREMIUM${RESET}"
+
+
     SO_INFO="$(lsb_release -ds 2>/dev/null | tr -d '"' || echo Linux)"
     IP_INFO="$(curl -s --max-time 2 ifconfig.me 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}')"
     CPU_INFO="$(nproc 2>/dev/null || echo 1)"
