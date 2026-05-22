@@ -1,0 +1,13 @@
+{
+  "listen": ":36712",
+  "cert": "/opt/UDPMOD/udpmod.server.crt",
+  "key": "/opt/UDPMOD/udpmod.server.key",
+  "obfs": "DarkZsaid",
+  "auth": {
+    "mode": "passwords",
+    "config": [
+      "steven:2026"
+    ]
+  },
+  "disable_udp": false
+}
