@@ -305,3 +305,11 @@ systemctl enable udpmod darkzsaid-udpmod-redirect zivpn 2>/dev/null || true
 systemctl restart udpmod 2>/dev/null || true
 systemctl restart darkzsaid-udpmod-redirect 2>/dev/null || true
 systemctl restart zivpn 2>/dev/null || true
+
+# ===== DARKZSAID WELCOME SSH FINAL =====
+mkdir -p /etc/profile.d
+if [ -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh ]; then
+  cp -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh /etc/profile.d/darkzsaid-welcome.sh
+  chmod +x /etc/profile.d/darkzsaid-welcome.sh
+  echo "" > /etc/motd
+fi
