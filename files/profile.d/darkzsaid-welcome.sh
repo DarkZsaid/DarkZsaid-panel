@@ -3,7 +3,6 @@
 clear
 
 BLANCO="\e[97m"
-CYAN="\e[96m"
 AZUL="\e[94m"
 VERDE="\e[92m"
 AMARILLO="\e[93m"

@@ -313,3 +313,125 @@ if [ -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh ]; then
   chmod +x /etc/profile.d/darkzsaid-welcome.sh
   echo "" > /etc/motd
 fi
+
+# ===== DARKZSAID FINAL RUNTIME TODO =====
+
+echo "Aplicando runtime final DarkZsaid..."
+
+mkdir -p /opt/darkzsaid/data
+mkdir -p /etc/profile.d
+mkdir -p /etc/udpmod
+mkdir -p /opt/UDPMOD
+mkdir -p /etc/zivpn
+mkdir -p /etc/stunnel
+mkdir -p /etc/adm-lite/userDIR
+
+# Bienvenida SSH premium
+if [ -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh ]; then
+  cp -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh /etc/profile.d/darkzsaid-welcome.sh
+  chmod +x /etc/profile.d/darkzsaid-welcome.sh
+  echo "" > /etc/motd
+fi
+
+# Forzar bienvenida en root
+if ! grep -q "darkzsaid-welcome.sh" /root/.bashrc 2>/dev/null; then
+cat >> /root/.bashrc <<'BASHRC'
+
+# DarkZsaid welcome
+if [ -f /etc/profile.d/darkzsaid-welcome.sh ]; then
+    source /etc/profile.d/darkzsaid-welcome.sh
+fi
+BASHRC
+fi
+
+# Datos TOKEN
+if [ -f /opt/darkzsaid/files/data/token_global.pass ]; then
+  cp -f /opt/darkzsaid/files/data/token_global.pass /opt/darkzsaid/data/token_global.pass
+else
+  echo "Steve2012" > /opt/darkzsaid/data/token_global.pass
+fi
+chmod 600 /opt/darkzsaid/data/token_global.pass 2>/dev/null || true
+
+[ -f /opt/darkzsaid/files/data/tokens_zivpn.db ] && cp -f /opt/darkzsaid/files/data/tokens_zivpn.db /opt/darkzsaid/data/tokens_zivpn.db
+[ -f /opt/darkzsaid/files/data/usuarios_ssh.db ] && cp -f /opt/darkzsaid/files/data/usuarios_ssh.db /opt/darkzsaid/data/usuarios_ssh.db
+[ -f /opt/darkzsaid/files/data/udpmod_users.db ] && cp -f /opt/darkzsaid/files/data/udpmod_users.db /opt/darkzsaid/data/udpmod_users.db
+
+# UDPMod / Hysteria 36712
+[ -f /opt/darkzsaid/files/udpmod/config.json ] && cp -f /opt/darkzsaid/files/udpmod/config.json /etc/udpmod/config.json
+[ -f /opt/darkzsaid/files/udpmod/udpmod.server.crt ] && cp -f /opt/darkzsaid/files/udpmod/udpmod.server.crt /opt/UDPMOD/udpmod.server.crt
+[ -f /opt/darkzsaid/files/udpmod/udpmod.server.key ] && cp -f /opt/darkzsaid/files/udpmod/udpmod.server.key /opt/UDPMOD/udpmod.server.key
+[ -f /opt/darkzsaid/files/systemd/udpmod.service ] && cp -f /opt/darkzsaid/files/systemd/udpmod.service /etc/systemd/system/udpmod.service
+[ -f /opt/darkzsaid/files/systemd/darkzsaid-udpmod-redirect.service ] && cp -f /opt/darkzsaid/files/systemd/darkzsaid-udpmod-redirect.service /etc/systemd/system/darkzsaid-udpmod-redirect.service
+
+# ZiVPN 5667
+[ -f /opt/darkzsaid/files/zivpn/config.json ] && cp -f /opt/darkzsaid/files/zivpn/config.json /etc/zivpn/config.json
+[ -f /opt/darkzsaid/files/zivpn/zivpn.crt ] && cp -f /opt/darkzsaid/files/zivpn/zivpn.crt /etc/zivpn/zivpn.crt
+[ -f /opt/darkzsaid/files/zivpn/zivpn.key ] && cp -f /opt/darkzsaid/files/zivpn/zivpn.key /etc/zivpn/zivpn.key
+[ -f /opt/darkzsaid/files/bin/zivpn ] && cp -f /opt/darkzsaid/files/bin/zivpn /usr/local/bin/zivpn && chmod +x /usr/local/bin/zivpn
+[ -f /opt/darkzsaid/files/systemd/zivpn.service ] && cp -f /opt/darkzsaid/files/systemd/zivpn.service /etc/systemd/system/zivpn.service
+
+# SSL 443 / Stunnel hacia SSH 22
+apt install -y stunnel4 openssl >/dev/null 2>&1 || true
+
+if [ -f /opt/darkzsaid/files/stunnel/stunnel.conf ]; then
+  cp -f /opt/darkzsaid/files/stunnel/stunnel.conf /etc/stunnel/stunnel.conf
+else
+cat > /etc/stunnel/stunnel.conf <<'STUNNEL'
+cert = /etc/stunnel/stunnel.pem
+client = no
+foreground = no
+pid = /var/run/stunnel4/stunnel.pid
+debug = 3
+
+[ssh-ssl]
+accept = 0.0.0.0:443
+connect = 127.0.0.1:22
+TIMEOUTclose = 0
+STUNNEL
+fi
+
+if [ -f /opt/darkzsaid/files/stunnel/stunnel.pem ]; then
+  cp -f /opt/darkzsaid/files/stunnel/stunnel.pem /etc/stunnel/stunnel.pem
+else
+  openssl req -new -x509 -days 3650 -nodes \
+    -out /etc/stunnel/stunnel.pem \
+    -keyout /etc/stunnel/stunnel.pem \
+    -subj "/CN=DarkZsaid" >/dev/null 2>&1
+fi
+
+chmod 600 /etc/stunnel/stunnel.pem 2>/dev/null || true
+
+if [ -f /opt/darkzsaid/files/default/stunnel4 ]; then
+  cp -f /opt/darkzsaid/files/default/stunnel4 /etc/default/stunnel4
+else
+  echo "ENABLED=1" > /etc/default/stunnel4
+fi
+
+# Permisos panel
+chmod +x /opt/darkzsaid/panel.sh 2>/dev/null || true
+chmod +x /opt/darkzsaid/menus/*.sh 2>/dev/null || true
+ln -sf /opt/darkzsaid/panel.sh /usr/local/bin/menu
+ln -sf /opt/darkzsaid/panel.sh /usr/local/bin/darkzsaid
+chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid
+
+# Puertos
+iptables -D INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
+iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+iptables -D INPUT -p udp --dport 36712 -j ACCEPT 2>/dev/null || true
+iptables -I INPUT -p udp --dport 36712 -j ACCEPT
+iptables -D INPUT -p udp --dport 5667 -j ACCEPT 2>/dev/null || true
+iptables -I INPUT -p udp --dport 5667 -j ACCEPT
+ufw allow 443/tcp >/dev/null 2>&1 || true
+ufw allow 36712/udp >/dev/null 2>&1 || true
+ufw allow 5667/udp >/dev/null 2>&1 || true
+
+# Servicios
+systemctl daemon-reload
+systemctl enable udpmod darkzsaid-udpmod-redirect zivpn stunnel4 2>/dev/null || true
+systemctl restart ssh 2>/dev/null || true
+systemctl restart udpmod 2>/dev/null || true
+systemctl restart darkzsaid-udpmod-redirect 2>/dev/null || true
+systemctl restart zivpn 2>/dev/null || true
+systemctl restart stunnel4 2>/dev/null || true
+
+echo "Runtime final DarkZsaid aplicado."
