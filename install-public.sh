@@ -151,6 +151,57 @@ disable_extra_protocols() {
     iptables -t nat -D PREROUTING -p udp --dport 10000:65000 -j REDIRECT --to-ports 36712 2>/dev/null || true
 }
 
+
+ensure_binaries_clean() {
+    mkdir -p /opt/UDPMOD /etc/udpmod /etc/zivpn /opt/darkzsaid/files/bin
+
+    # Binario Hysteria v1 para UDPMod, pero SIN activar servicio por defecto
+    if [ ! -x /opt/UDPMOD/hysteria-linux-amd64 ]; then
+        wget -q -O /opt/UDPMOD/hysteria-linux-amd64 "https://github.com/apernet/hysteria/releases/download/v1.3.5/hysteria-linux-amd64"
+        chmod +x /opt/UDPMOD/hysteria-linux-amd64
+    fi
+
+    # ZiVPN: copiar si viene guardado en el repo. No activar por defecto.
+    if [ -f /opt/darkzsaid/files/bin/zivpn ]; then
+        cp -f /opt/darkzsaid/files/bin/zivpn /usr/local/bin/zivpn
+        chmod +x /usr/local/bin/zivpn
+    fi
+
+    # Certificados base si algún protocolo se activa después desde el menú
+    if [ ! -f /opt/UDPMOD/udpmod.server.crt ] || [ ! -f /opt/UDPMOD/udpmod.server.key ]; then
+        openssl req -x509 -newkey rsa:2048 -nodes \
+          -keyout /opt/UDPMOD/udpmod.server.key \
+          -out /opt/UDPMOD/udpmod.server.crt \
+          -days 3650 \
+          -subj "/CN=DarkZsaid" >/dev/null 2>&1
+    fi
+
+    if [ ! -f /etc/zivpn/zivpn.crt ] || [ ! -f /etc/zivpn/zivpn.key ]; then
+        openssl req -x509 -newkey rsa:2048 -nodes \
+          -keyout /etc/zivpn/zivpn.key \
+          -out /etc/zivpn/zivpn.crt \
+          -days 3650 \
+          -subj "/CN=zivpn" >/dev/null 2>&1
+    fi
+
+    # Reconfirmar permisos del panel
+    chmod +x /opt/darkzsaid/panel.sh 2>/dev/null || true
+    chmod +x /opt/darkzsaid/menus/*.sh 2>/dev/null || true
+    ln -sf /opt/darkzsaid/panel.sh /usr/local/bin/menu
+    ln -sf /opt/darkzsaid/panel.sh /usr/local/bin/darkzsaid
+    chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid
+
+    # Verificación de binarios obligatorios
+    for bin in bash curl wget git python3 iptables ss systemctl openssl toilet figlet; do
+        command -v "$bin" >/dev/null 2>&1 || return 1
+    done
+
+    # Hysteria sí debe quedar listo, pero apagado
+    [ -x /opt/UDPMOD/hysteria-linux-amd64 ] || return 1
+
+    return 0
+}
+
 final_check() {
     bash -n /opt/darkzsaid/panel.sh
     bash -n /opt/darkzsaid/menus/users_menu.sh 2>/dev/null || true
@@ -169,6 +220,7 @@ run_step "Instalando bienvenida SSH premium" setup_welcome
 run_step "Limpiando clientes y tokens de plantilla" clean_runtime_data
 run_step "Aplicando puertos default 22 y DNS 53" default_ports_only
 run_step "Dejando protocolos extra apagados" disable_extra_protocols
+run_step "Verificando y reparando binarios" ensure_binaries_clean
 run_step "Verificando instalación limpia" final_check
 
 echo ""
