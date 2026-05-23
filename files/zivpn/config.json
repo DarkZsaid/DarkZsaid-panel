@@ -1,0 +1,13 @@
+{
+  "listen": ":5667",
+  "cert": "/etc/zivpn/zivpn.crt",
+  "key": "/etc/zivpn/zivpn.key",
+  "max_conn": 0,
+  "obfs": "zivpn",
+  "auth": {
+    "mode": "passwords",
+    "config": [
+      "darkzsaid"
+    ]
+  }
+}

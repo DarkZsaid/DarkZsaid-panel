@@ -1,0 +1,12 @@
+[Unit]
+Description=DarkZsaid UDPMod Redirect 10000-65000 to 36712
+After=network.target udpmod.service
+Wants=udpmod.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/darkzsaid/menus/fix_udpmod_redirect_10000_65000.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
