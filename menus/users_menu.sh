@@ -212,7 +212,13 @@ crear_normal() {
     guardar_usuario_db "$usuario" "$pass" "NORMAL" "$limite" "$dias" "$expira"
 
     echo ""
-    echo -e "${VERDE}✔ Usuario creado correctamente.${RESET}"
+    echo ""
+    echo -e "${CYAN}╔══════════════════════════════════════════════╗${RESET}"
+    echo -e "${CYAN}║${RESET}        ${BLANCO}${BOLD}CUENTA SSH CREADA${RESET}              ${CYAN}║${RESET}"
+    echo -e "${CYAN}╚══════════════════════════════════════════════╝${RESET}"
+    echo ""
+    echo -e "${VERDE}${BOLD}✔ Usuario creado correctamente.${RESET}"
+    echo ""
     echo ""
     echo -e "${AMARILLO}Usuario:${RESET} $usuario"
     echo -e "${AMARILLO}Contraseña:${RESET} $pass"
@@ -271,9 +277,6 @@ menu_agregar_usuario() {
         titulo_users "AGREGAR USUARIO"
 
         echo -e "${ROJO}[01]${RESET} ${CYAN}➜${RESET} ${BLANCO}SSH DROPBEAR${RESET}"
-        echo -e "${ROJO}[02]${RESET} ${CYAN}➜${RESET} ${BLANCO}HWID${RESET}"
-        echo -e "${ROJO}[03]${RESET} ${CYAN}➜${RESET} ${BLANCO}TOKEN${RESET}"
-        echo -e "${ROJO}[04]${RESET} ${CYAN}➜${RESET} ${BLANCO}MODIFICAR CONTRASEÑA TOKEN${RESET}"
         echo ""
         echo -e "${ROJO}[00]${RESET} ${CYAN}➜${RESET} ${ROJO}[ VOLVER ]${RESET}"
 
@@ -1286,6 +1289,8 @@ idx = 1
 
 # Mostrar primero usuarios de la base
 for user in orden:
+    if user.lower() == "unknown":
+        continue
     cant = conexiones.get(user, 0)
     if cant <= 0:
         continue
@@ -1297,6 +1302,8 @@ for user in orden:
 
 # Mostrar conectados que no estén en la base
 for user, cant in conexiones.items():
+    if user.lower() == "unknown":
+        continue
     if user in limites:
         continue
     if cant <= 0:

@@ -85,7 +85,6 @@ cfg.setdefault("disable_udp", False)
 
 CONFIG.write_text(json.dumps(cfg, indent=2, ensure_ascii=False) + "\n")
 
-print(f"UDPMOD OK | OBFS={OBFS} | USUARIOS={len(auth_users)}")
 PY
 
 ufw allow 36712/udp >/dev/null 2>&1 || true
