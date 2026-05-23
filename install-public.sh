@@ -194,3 +194,10 @@ echo -e "Rango UDP: ${GREEN}10000:65000 → 36712${RESET}"
 echo ""
 echo -e "${YELLOW}Log de instalación:${RESET} $LOG"
 echo ""
+
+# ===== DARKZSAID WELCOME SSH =====
+if [ -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh ]; then
+    cp -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh /etc/profile.d/darkzsaid-welcome.sh
+    chmod +x /etc/profile.d/darkzsaid-welcome.sh
+    echo "" > /etc/motd
+fi
