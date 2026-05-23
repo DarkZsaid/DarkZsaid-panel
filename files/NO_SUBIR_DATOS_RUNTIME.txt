@@ -1,0 +1,19 @@
+NO SUBIR DATOS RUNTIME DE VPS A ESTE REPO.
+
+Este repo debe quedar limpio para instalar VPS nuevas.
+
+No guardar aquí:
+- clientes reales
+- tokens reales
+- usuarios_ssh.db
+- tokens_zivpn.db
+- udpmod_users.db
+- certificados privados de una VPS
+- configs activas de UDPMod/ZiVPN/stunnel copiadas de producción
+- servicios systemd activos de una VPS vieja
+
+La VPS nueva debe instalarse limpia:
+- SSH 22
+- DNS 53 permitido
+- sin clientes
+- protocolos apagados hasta activarlos desde el menú
