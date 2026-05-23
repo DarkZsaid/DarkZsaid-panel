@@ -1,168 +1,196 @@
-
-mkdir -p /opt/darkzsaid/lib /opt/darkzsaid/logs 2>/dev/null || true
-
-if [[ -f /opt/darkzsaid/lib/install_clean.sh ]]; then
-    source /opt/darkzsaid/lib/install_clean.sh
-else
-    clean_title(){ clear; echo "$1"; echo ""; }
-    clean_task(){ echo "$1"; bash -c "$2" >/dev/null 2>&1; }
-    clean_task_soft(){ echo "$1"; bash -c "$2" >/dev/null 2>&1 || true; }
-    clean_done(){ echo "Proceso completado."; }
-fi
-
 #!/bin/bash
 
 clear
 
-ROJO="\e[31m"
-VERDE="\e[32m"
-AMARILLO="\e[33m"
-CYAN="\e[36m"
-BLANCO="\e[97m"
-RESET="\e[0m"
+LOG="/root/darkzsaid-install.log"
+: > "$LOG"
+
+BLUE="\e[94m"
+CYAN="\e[96m"
+GREEN="\e[92m"
+YELLOW="\e[93m"
+RED="\e[91m"
+WHITE="\e[97m"
 BOLD="\e[1m"
+RESET="\e[0m"
 
-REPO_URL="https://github.com/DarkZsaid/DarkZsaid-panel.git"
-APP_DIR="/opt/darkzsaid"
-
-echo -e "${ROJO}════════════════════════════════════════════════════${RESET}"
-echo -e "${BLANCO}${BOLD}        DARKZSAID PANEL INSTALLER                  ${RESET}"
-echo -e "${ROJO}════════════════════════════════════════════════════${RESET}"
+banner() {
+clear
+echo -e "${CYAN}${BOLD}"
+echo "██████╗  █████╗ ██████╗ ██╗  ██╗███████╗███████╗ █████╗ ██╗██████╗ "
+echo "██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝╚══███╔╝██╔════╝██╔══██╗██║██╔══██╗"
+echo "██║  ██║███████║██████╔╝█████╔╝   ███╔╝ ███████╗███████║██║██║  ██║"
+echo "██║  ██║██╔══██║██╔══██╗██╔═██╗  ███╔╝  ╚════██║██╔══██║██║██║  ██║"
+echo "██████╔╝██║  ██║██║  ██║██║  ██╗███████╗███████║██║  ██║██║██████╔╝"
+echo "╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚═════╝ "
+echo -e "${RESET}"
+echo -e "${WHITE}${BOLD}          DARKZSAID VPS MANAGER / PANEL SSH${RESET}"
+echo -e "${CYAN}────────────────────────────────────────────────────────────${RESET}"
 echo ""
+}
 
-if [[ "$(id -u)" -ne 0 ]]; then
-    echo -e "${ROJO}Debes ejecutar como root.${RESET}"
-    exit 1
-fi
+run_step() {
+    local msg="$1"
+    shift
 
-echo -e "${CYAN}Instalando dependencias base...${RESET}"
-apt update
-apt install -y git curl wget nano ufw python3 python3-pip python3-venv openssl lsof net-tools unzip iptables-persistent netfilter-persistent sshpass rsync
+    echo -ne "${CYAN}➜${RESET} ${WHITE}${BOLD}${msg}${RESET} "
+
+    "$@" >> "$LOG" 2>&1 &
+    local pid=$!
+
+    local spin='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local i=0
+
+    while kill -0 "$pid" 2>/dev/null; do
+        i=$(( (i+1) % 10 ))
+        echo -ne "\r${CYAN}➜${RESET} ${WHITE}${BOLD}${msg}${RESET} ${YELLOW}${spin:$i:1}${RESET}"
+        sleep 0.1
+    done
+
+    wait "$pid"
+    local status=$?
+
+    if [ "$status" -eq 0 ]; then
+        echo -e "\r${GREEN}✅${RESET} ${WHITE}${BOLD}${msg}${RESET}"
+    else
+        echo -e "\r${RED}❌${RESET} ${WHITE}${BOLD}${msg}${RESET}"
+        echo ""
+        echo -e "${RED}Error. Revisa el log:${RESET} $LOG"
+        exit 1
+    fi
+}
+
+install_base() {
+    apt update -y
+    apt install -y git curl wget sudo dos2unix toilet figlet openssl iptables ufw
+}
+
+clone_panel() {
+    rm -rf /opt/darkzsaid
+    git clone https://github.com/stevenjosecarcamo-star/DarkZsaid--panel.git /opt/darkzsaid
+}
+
+fix_permissions() {
+    cd /opt/darkzsaid || exit 1
+    find /opt/darkzsaid -type f -name "*.sh" -exec dos2unix {} \;
+    chmod +x /opt/darkzsaid/*.sh 2>/dev/null || true
+    chmod +x /opt/darkzsaid/menus/*.sh 2>/dev/null || true
+    bash -n /opt/darkzsaid/panel.sh
+    ln -sf /opt/darkzsaid/panel.sh /usr/local/bin/menu
+    ln -sf /opt/darkzsaid/panel.sh /usr/local/bin/darkzsaid
+    chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid
+}
+
+setup_logo() {
+    mkdir -p /etc/darkzsaid
+    cat > /etc/darkzsaid/panel_logo.conf <<'CONF'
+PANEL_LOGO_TEXT="DarkZsaid"
+CONF
+}
+
+setup_udpmod() {
+    mkdir -p /opt/UDPMOD /etc/udpmod
+
+    wget -q -O /opt/UDPMOD/hysteria-linux-amd64 \
+    https://github.com/apernet/hysteria/releases/download/v1.3.5/hysteria-linux-amd64
+
+    chmod +x /opt/UDPMOD/hysteria-linux-amd64
+
+    openssl req -x509 -newkey rsa:2048 -nodes \
+    -keyout /opt/UDPMOD/udpmod.server.key \
+    -out /opt/UDPMOD/udpmod.server.crt \
+    -days 3650 \
+    -subj "/CN=DarkZsaid"
+
+    chmod 600 /opt/UDPMOD/udpmod.server.key
+    chmod 644 /opt/UDPMOD/udpmod.server.crt
+
+    cat > /etc/udpmod/config.json <<'CONF'
+{
+  "listen": ":36712",
+  "cert": "/opt/UDPMOD/udpmod.server.crt",
+  "key": "/opt/UDPMOD/udpmod.server.key",
+  "obfs": "DarkZsaid",
+  "auth": {
+    "mode": "passwords",
+    "config": ["DarkZsaid"]
+  },
+  "disable_udp": false,
+  "alpn": "",
+  "up_mbps": 17,
+  "down_mbps": 15
+}
+CONF
+
+    cat > /etc/systemd/system/udpmod.service <<'SERVICE'
+[Unit]
+Description=DarkZsaid UDPMod Hysteria v1 36712
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/UDPMOD/hysteria-linux-amd64 server -c /etc/udpmod/config.json
+Restart=always
+RestartSec=3
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+}
+
+setup_redirect() {
+    cat > /etc/systemd/system/darkzsaid-udpmod-redirect.service <<'SERVICE'
+[Unit]
+Description=DarkZsaid UDPMod Redirect 10000-65000 to 36712
+After=network.target udpmod.service
+Wants=udpmod.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'iptables -t nat -D PREROUTING -p udp --dport 10000:65000 -j REDIRECT --to-ports 36712 2>/dev/null || true; iptables -t nat -A PREROUTING -p udp --dport 10000:65000 -j REDIRECT --to-ports 36712; iptables -D INPUT -p udp --dport 36712 -j ACCEPT 2>/dev/null || true; iptables -I INPUT -p udp --dport 36712 -j ACCEPT; ufw allow 36712/udp >/dev/null 2>&1 || true'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+}
+
+start_services() {
+    systemctl daemon-reload
+    systemctl enable udpmod darkzsaid-udpmod-redirect
+    systemctl restart udpmod
+    systemctl restart darkzsaid-udpmod-redirect
+}
+
+final_check() {
+    bash -n /opt/darkzsaid/panel.sh
+    systemctl is-active --quiet udpmod
+    ss -lunp | grep -q 36712
+}
+
+banner
+run_step "Instalando dependencias base" install_base
+run_step "Descargando panel DarkZsaid" clone_panel
+run_step "Preparando permisos y comandos" fix_permissions
+run_step "Configurando logo superior" setup_logo
+run_step "Descargando binarios UDPMod Hysteria" setup_udpmod
+run_step "Configurando redirección UDP 10000:65000 → 36712" setup_redirect
+run_step "Activando servicios DarkZsaid" start_services
+run_step "Verificando instalación final" final_check
 
 echo ""
-echo -e "${CYAN}Preparando instalación limpia...${RESET}"
-
-if [[ -d "$APP_DIR" ]]; then
-    FECHA=$(date +%Y%m%d-%H%M%S)
-    echo -e "${AMARILLO}Ya existe $APP_DIR. Creando backup...${RESET}"
-    tar -czf "/root/darkzsaid-before-install-$FECHA.tar.gz" "$APP_DIR" 2>/dev/null || true
-    rm -rf "$APP_DIR"
-fi
-
-
+echo -e "${GREEN}${BOLD}✅ DARKZSAID INSTALADO CORRECTAMENTE${RESET}"
 echo ""
-echo -e "${CYAN}Limpiando protocolos/puertos activos anteriores...${RESET}"
-
-SERVICIOS_LIMPIAR=(
-  nginx
-  stunnel4
-  stunnel
-  dropbear
-  badvpn
-  badvpn-udpgw
-  udp-custom
-  udpmod
-  hysteria-server
-  hysteria
-  zivpn
-  sipvpn-activex
-  socks
-  socks-ws
-  ws
-  ws-stunnel
-  python-ws
-)
-
-for s in "${SERVICIOS_LIMPIAR[@]}"; do
-    systemctl stop "$s" 2>/dev/null || true
-    systemctl disable "$s" 2>/dev/null || true
-done
-
-pkill -f "badvpn" 2>/dev/null || true
-pkill -f "stunnel" 2>/dev/null || true
-pkill -f "nginx" 2>/dev/null || true
-pkill -f "socks-python" 2>/dev/null || true
-pkill -f "ssh-ws" 2>/dev/null || true
-pkill -f "udp-custom" 2>/dev/null || true
-pkill -f "udpmod" 2>/dev/null || true
-pkill -f "hysteria" 2>/dev/null || true
-pkill -f "ZipVPN" 2>/dev/null || true
-
-ufw --force reset 2>/dev/null || true
-ufw allow 22/tcp 2>/dev/null || true
-ufw --force enable 2>/dev/null || true
-
-echo -e "${VERDE}Limpieza inicial aplicada. Solo SSH 22 queda permitido por defecto.${RESET}"
-
-
+echo -e "${WHITE}${BOLD}Comandos disponibles:${RESET}"
+echo -e "${CYAN}menu${RESET}"
+echo -e "${CYAN}darkzsaid${RESET}"
 echo ""
-echo -e "${CYAN}Descargando DarkZsaid Panel limpio...${RESET}"
-
-git clone --quiet "$REPO_URL" "$APP_DIR"
-
-if [[ ! -d "$APP_DIR" ]]; then
-    echo -e "${ROJO}Error: no se pudo clonar el repositorio.${RESET}"
-    exit 1
-fi
-
+echo -e "${WHITE}${BOLD}UDPMod / Hysteria:${RESET}"
+echo -e "Puerto: ${GREEN}36712${RESET}"
+echo -e "OBFS: ${GREEN}DarkZsaid${RESET}"
+echo -e "Password: ${GREEN}DarkZsaid${RESET}"
+echo -e "Rango UDP: ${GREEN}10000:65000 → 36712${RESET}"
 echo ""
-echo -e "${CYAN}Ejecutando instalador principal limpio...${RESET}"
-
-cd "$APP_DIR" || exit 1
-
-chmod +x install.sh 2>/dev/null || true
-bash install.sh
-
+echo -e "${YELLOW}Log de instalación:${RESET} $LOG"
 echo ""
-echo -e "${CYAN}Instalando comandos globales...${RESET}"
-
-if [[ -f "$APP_DIR/darkzsaid-update.sh" ]]; then
-    chmod +x "$APP_DIR/darkzsaid-update.sh"
-    ln -sf "$APP_DIR/darkzsaid-update.sh" /usr/local/bin/darkzsaid-update
-fi
-
-ln -sf "$APP_DIR/panel.sh" /usr/local/bin/darkzsaid
-ln -sf "$APP_DIR/panel.sh" /usr/local/bin/menu
-
-chmod +x /usr/local/bin/darkzsaid
-chmod +x /usr/local/bin/menu
-
-echo ""
-
-echo ""
-echo -e "${CYAN}Configurando actualizador DarkZsaid...${RESET}"
-
-if [[ -f "$APP_DIR/darkzsaid-update.sh" ]]; then
-    chmod +x "$APP_DIR/darkzsaid-update.sh"
-    ln -sf "$APP_DIR/darkzsaid-update.sh" /usr/local/bin/darkzsaid-update
-    chmod +x /usr/local/bin/darkzsaid-update
-fi
-
-
-
-echo ""
-echo -e "${CYAN}Configurando optimizador/actualizador DarkZsaid...${RESET}"
-
-if [[ -f "$APP_DIR/darkzsaid-update.sh" ]]; then
-    chmod +x "$APP_DIR/darkzsaid-update.sh"
-    ln -sf "$APP_DIR/darkzsaid-update.sh" /usr/local/bin/darkzsaid-update
-    chmod +x /usr/local/bin/darkzsaid-update
-fi
-
-
-echo -e "${VERDE}${BOLD}Instalación limpia terminada correctamente.${RESET}"
-echo ""
-echo -e "${AMARILLO}Estado inicial:${RESET}"
-echo "Solo SSH 22 queda abierto."
-echo "Sin usuarios copiados."
-echo "Sin tokens copiados."
-echo "Sin protocolos activados automáticamente."
-echo ""
-echo -e "${AMARILLO}Comandos disponibles:${RESET}"
-echo "menu"
-echo "darkzsaid"
-echo "darkzsaid-update"
-echo ""
-echo -e "${CYAN}Abriendo panel...${RESET}"
-sleep 2
-menu
