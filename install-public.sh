@@ -266,3 +266,42 @@ echo -e "${WHITE}${BOLD}Rango UDP:${RESET} ${GREEN}10000:65000 → 36712${RESET}
 echo ""
 echo -e "${YELLOW}Log:${RESET} $LOG"
 echo ""
+
+# ===== DARKZSAID RUNTIME FINAL: TOKEN / UDPMOD / ZIVPN / WELCOME =====
+mkdir -p /opt/darkzsaid/data /etc/adm-lite/userDIR /etc/udpmod /opt/UDPMOD /etc/zivpn /etc/profile.d
+
+if [ -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh ]; then
+  cp -f /opt/darkzsaid/files/profile.d/darkzsaid-welcome.sh /etc/profile.d/darkzsaid-welcome.sh
+  chmod +x /etc/profile.d/darkzsaid-welcome.sh
+  echo "" > /etc/motd
+fi
+
+if [ -f /opt/darkzsaid/files/data/token_global.pass ]; then
+  cp -f /opt/darkzsaid/files/data/token_global.pass /opt/darkzsaid/data/token_global.pass
+else
+  echo "Steve2012" > /opt/darkzsaid/data/token_global.pass
+fi
+chmod 600 /opt/darkzsaid/data/token_global.pass 2>/dev/null || true
+
+[ -f /opt/darkzsaid/files/data/tokens_zivpn.db ] && cp -f /opt/darkzsaid/files/data/tokens_zivpn.db /opt/darkzsaid/data/tokens_zivpn.db
+[ -f /opt/darkzsaid/files/data/usuarios_ssh.db ] && cp -f /opt/darkzsaid/files/data/usuarios_ssh.db /opt/darkzsaid/data/usuarios_ssh.db
+[ -f /opt/darkzsaid/files/data/udpmod_users.db ] && cp -f /opt/darkzsaid/files/data/udpmod_users.db /opt/darkzsaid/data/udpmod_users.db
+
+[ -f /opt/darkzsaid/files/udpmod/config.json ] && cp -f /opt/darkzsaid/files/udpmod/config.json /etc/udpmod/config.json
+[ -f /opt/darkzsaid/files/udpmod/udpmod.server.crt ] && cp -f /opt/darkzsaid/files/udpmod/udpmod.server.crt /opt/UDPMOD/udpmod.server.crt
+[ -f /opt/darkzsaid/files/udpmod/udpmod.server.key ] && cp -f /opt/darkzsaid/files/udpmod/udpmod.server.key /opt/UDPMOD/udpmod.server.key
+
+[ -f /opt/darkzsaid/files/zivpn/config.json ] && cp -f /opt/darkzsaid/files/zivpn/config.json /etc/zivpn/config.json
+[ -f /opt/darkzsaid/files/zivpn/zivpn.crt ] && cp -f /opt/darkzsaid/files/zivpn/zivpn.crt /etc/zivpn/zivpn.crt
+[ -f /opt/darkzsaid/files/zivpn/zivpn.key ] && cp -f /opt/darkzsaid/files/zivpn/zivpn.key /etc/zivpn/zivpn.key
+[ -f /opt/darkzsaid/files/bin/zivpn ] && cp -f /opt/darkzsaid/files/bin/zivpn /usr/local/bin/zivpn && chmod +x /usr/local/bin/zivpn
+
+[ -f /opt/darkzsaid/files/systemd/udpmod.service ] && cp -f /opt/darkzsaid/files/systemd/udpmod.service /etc/systemd/system/udpmod.service
+[ -f /opt/darkzsaid/files/systemd/darkzsaid-udpmod-redirect.service ] && cp -f /opt/darkzsaid/files/systemd/darkzsaid-udpmod-redirect.service /etc/systemd/system/darkzsaid-udpmod-redirect.service
+[ -f /opt/darkzsaid/files/systemd/zivpn.service ] && cp -f /opt/darkzsaid/files/systemd/zivpn.service /etc/systemd/system/zivpn.service
+
+systemctl daemon-reload
+systemctl enable udpmod darkzsaid-udpmod-redirect zivpn 2>/dev/null || true
+systemctl restart udpmod 2>/dev/null || true
+systemctl restart darkzsaid-udpmod-redirect 2>/dev/null || true
+systemctl restart zivpn 2>/dev/null || true
