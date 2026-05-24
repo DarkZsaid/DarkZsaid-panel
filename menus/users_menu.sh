@@ -1,4 +1,376 @@
 
+borrar_todos_usuarios_seguro() {
+    clear
+    echo -e "${ROJO}${BOLD}BORRAR TODOS LOS USUARIOS REGISTRADOS${RESET}"
+    echo -e "${AMARILLO}────────────────────────────────────────────${RESET}"
+    echo ""
+
+    DB="/opt/darkzsaid/data/usuarios_ssh.db"
+    TMP="/tmp/darkzsaid_users_delete_$$.txt"
+
+    if [[ ! -f "$DB" || ! -s "$DB" ]]; then
+        echo -e "${AMARILLO}No hay usuarios registrados para borrar.${RESET}"
+        read -r -p "Presiona ENTER para continuar..."
+        return
+    fi
+
+    awk -F'|' '
+    NF>=1 {
+        u=$1
+        if (u != "" && u != "0" && u != "root" && u != "ubuntu" && u != "admin" && u != "sshd" && u != "nobody") print u
+    }' "$DB" | sort -u > "$TMP"
+
+    if [[ ! -s "$TMP" ]]; then
+        echo -e "${AMARILLO}No hay usuarios seguros para eliminar.${RESET}"
+        rm -f "$TMP"
+        read -r -p "Presiona ENTER para continuar..."
+        return
+    fi
+
+    echo -e "${AMARILLO}Se eliminarán estos usuarios:${RESET}"
+    echo ""
+    n=1
+    while read -r usuario; do
+        echo -e "${ROJO}[$n]${RESET} ${BLANCO}$usuario${RESET}"
+        n=$((n+1))
+    done < "$TMP"
+
+    echo ""
+    echo -e "${ROJO}Esto NO borrará root, ubuntu, 0 ni usuarios del sistema.${RESET}"
+    read -r -p "Escriba SI para confirmar: " confirma
+
+    if [[ "$confirma" != "SI" ]]; then
+        echo -e "${AMARILLO}Cancelado.${RESET}"
+        rm -f "$TMP"
+        read -r -p "Presiona ENTER para continuar..."
+        return
+    fi
+
+    echo ""
+    while read -r usuario; do
+        [[ -z "$usuario" ]] && continue
+
+        echo -e "${CYAN}➜ Eliminando usuario:${RESET} ${BLANCO}$usuario${RESET}"
+
+        # matar solo procesos de ese usuario, nunca sshd global
+        pkill -u "$usuario" 2>/dev/null || true
+
+        # borrar usuario Linux si existe
+        if id "$usuario" >/dev/null 2>&1; then
+            userdel -f "$usuario" 2>/dev/null || deluser --remove-home "$usuario" 2>/dev/null || true
+        fi
+
+        # borrar carpeta adm-lite si existe
+        rm -f "/etc/adm-lite/userDIR/$usuario" 2>/dev/null || true
+
+    done < "$TMP"
+
+    # limpiar bases sin tocar archivos del sistema
+    cp -f "$DB" "$DB.bak_delete_all_$FECHA" 2>/dev/null || true
+    : > "$DB"
+
+    # limpiar bases extra solo de registros, no borrar servicios
+    : > /opt/darkzsaid/data/tokens_zivpn.db 2>/dev/null || true
+    : > /opt/darkzsaid/data/udpmod_users.db 2>/dev/null || true
+
+    rm -f "$TMP"
+
+    echo ""
+    echo -e "${VERDE}${BOLD}✔ Usuarios eliminados sin cerrar SSH.${RESET}"
+    echo ""
+    read -r -p "Presiona ENTER para continuar..."
+}
+
+
+checkuser_protocolo_menu() {
+    while true; do
+        clear
+        echo -e "${CYAN}╔════════════════════════════════════════════════════╗${RESET}"
+        echo -e "${CYAN}║${RESET} ${BLANCO}${BOLD}           CHECK USER API / PROTOCOLO          ${RESET}${CYAN}║${RESET}"
+        echo -e "${CYAN}╚════════════════════════════════════════════════════╝${RESET}"
+        echo ""
+
+        if systemctl is-active --quiet darkzsaid-checkuser 2>/dev/null; then
+            ESTADO_CHK="${VERDE}ACTIVO${RESET}"
+        else
+            ESTADO_CHK="${ROJO}APAGADO${RESET}"
+        fi
+
+        PUERTO_CHK=$(grep -m1 '^Environment=CHECKUSER_PORT=' /etc/systemd/system/darkzsaid-checkuser.service 2>/dev/null | cut -d= -f3)
+        [[ -z "$PUERTO_CHK" ]] && PUERTO_CHK="2095"
+
+        if ss -lntup 2>/dev/null | grep -q ":${PUERTO_CHK}"; then
+            PUERTO_TXT="${VERDE}${PUERTO_CHK} ABIERTO${RESET}"
+        else
+            PUERTO_TXT="${ROJO}${PUERTO_CHK} CERRADO${RESET}"
+        fi
+
+        IP_PUBLICA=$(curl -s --max-time 3 ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+
+        echo -e "${AMARILLO} Servicio CheckUser :${RESET} $ESTADO_CHK"
+        echo -e "${AMARILLO} Puerto API         :${RESET} $PUERTO_TXT"
+        echo -e "${AMARILLO} URL App            :${RESET} ${BLANCO}http://${IP_PUBLICA}:${PUERTO_CHK}/checkUser${RESET}"
+        echo ""
+        echo -e "${CYAN}┌──────────────────────────────────────────────────┐${RESET}"
+        echo -e "${CYAN}│${RESET} ${ROJO}[1]${RESET} ${BLANCO}Activar / instalar CheckUser API${RESET}"
+        echo -e "${CYAN}│${RESET} ${ROJO}[2]${RESET} ${BLANCO}Detener CheckUser API${RESET}"
+        echo -e "${CYAN}│${RESET} ${ROJO}[3]${RESET} ${BLANCO}Reiniciar CheckUser API${RESET}"
+        echo -e "${CYAN}│${RESET} ${ROJO}[4]${RESET} ${BLANCO}Ver URL / probar usuario${RESET}"
+        echo -e "${CYAN}│${RESET} ${ROJO}[5]${RESET} ${BLANCO}Remover CheckUser API${RESET}"
+        echo -e "${CYAN}│${RESET} ${ROJO}[0]${RESET} ${AMARILLO}Volver${RESET}"
+        echo -e "${CYAN}└──────────────────────────────────────────────────┘${RESET}"
+        echo ""
+        read -r -p "⚡ Opción: " op_chk
+
+        case "$op_chk" in
+            1|01)
+                clear
+                echo -e "${CYAN}╔════════════════════════════════════════════════════╗${RESET}"
+                echo -e "${CYAN}║${RESET} ${BLANCO}${BOLD}        ACTIVAR CHECK USER API DARKZSAID       ${RESET}${CYAN}║${RESET}"
+                echo -e "${CYAN}╚════════════════════════════════════════════════════╝${RESET}"
+                echo ""
+                read -r -p "Puerto CheckUser [def: 2095]: " puerto
+                [[ -z "$puerto" ]] && puerto="2095"
+
+                if ! [[ "$puerto" =~ ^[0-9]+$ ]]; then
+                    echo -e "${ROJO}Puerto inválido.${RESET}"
+                    read -r -p "Presiona ENTER para continuar..."
+                    continue
+                fi
+
+                mkdir -p /opt/darkzsaid/bin /opt/darkzsaid/data /etc/adm-lite/userDIR
+
+                cat > /opt/darkzsaid/bin/checkuser_server.py <<'PYCHK'
+#!/usr/bin/env python3
+import json
+import os
+import urllib.parse
+from datetime import datetime, date
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+PORT = int(os.environ.get("CHECKUSER_PORT", "2095"))
+
+DBS = [
+    "/opt/darkzsaid/data/usuarios_ssh.db",
+    "/opt/darkzsaid/data/tokens_zivpn.db",
+    "/opt/darkzsaid/data/udpmod_users.db",
+]
+
+def parse_date(value):
+    value = (value or "").strip()
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d"):
+        try:
+            return datetime.strptime(value, fmt).date()
+        except Exception:
+            pass
+    return None
+
+def find_user(username, password):
+    username = (username or "").strip()
+    password = (password or "").strip()
+
+    if not username:
+        return None
+
+    for db in DBS:
+        if not os.path.isfile(db):
+            continue
+
+        with open(db, "r", errors="ignore") as f:
+            for line in f:
+                line = line.strip()
+                if not line or "|" not in line:
+                    continue
+
+                parts = line.split("|")
+
+                user = parts[0].strip() if len(parts) > 0 else ""
+                passwd = parts[1].strip() if len(parts) > 1 else ""
+                expira = parts[2].strip() if len(parts) > 2 else ""
+                tipo = parts[3].strip() if len(parts) > 3 else "NORMAL"
+
+                if user != username:
+                    continue
+
+                if password and passwd != password:
+                    continue
+
+                exp_date = parse_date(expira)
+                today = date.today()
+
+                if exp_date:
+                    dias = (exp_date - today).days
+                    activo = dias >= 0
+                else:
+                    dias = 0
+                    activo = True
+
+                return {
+                    "found": True,
+                    "usuario": user,
+                    "tipo": tipo,
+                    "estado": "ACTIVO" if activo else "EXPIRADO",
+                    "activo": activo,
+                    "dias": dias,
+                    "dias_restantes": dias,
+                    "expira": expira,
+                    "vencimiento": expira,
+                    "db": os.path.basename(db),
+                }
+
+    return None
+
+class Handler(BaseHTTPRequestHandler):
+    def log_message(self, fmt, *args):
+        return
+
+    def send_json(self, data, code=200):
+        body = json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        parsed = urllib.parse.urlparse(self.path)
+        query = urllib.parse.parse_qs(parsed.query)
+        path_parts = [x for x in parsed.path.split("/") if x]
+
+        user = (
+            query.get("user", [""])[0]
+            or query.get("usuario", [""])[0]
+            or query.get("username", [""])[0]
+        )
+
+        passwd = (
+            query.get("pass", [""])[0]
+            or query.get("password", [""])[0]
+            or query.get("clave", [""])[0]
+            or query.get("senha", [""])[0]
+        )
+
+        if len(path_parts) >= 3 and path_parts[0].lower() == "checkuser":
+            user = urllib.parse.unquote(path_parts[1])
+            passwd = urllib.parse.unquote(path_parts[2])
+
+        if parsed.path in ["/", "/checkUser", "/checkuser"] or parsed.path.lower().startswith("/checkuser"):
+            result = find_user(user, passwd)
+
+            if result:
+                return self.send_json(result)
+
+            return self.send_json({
+                "found": False,
+                "estado": "NO_EXISTE",
+                "activo": False,
+                "dias": 0,
+                "dias_restantes": 0,
+                "expira": "",
+                "vencimiento": "",
+                "mensaje": "Usuario no encontrado o contraseña incorrecta"
+            }, 404)
+
+        return self.send_json({
+            "status": "ok",
+            "service": "DarkZsaid CheckUser",
+            "endpoint": "/checkUser?user=USUARIO&pass=CLAVE"
+        })
+
+if __name__ == "__main__":
+    server = HTTPServer(("0.0.0.0", PORT), Handler)
+    print(f"DarkZsaid CheckUser activo en puerto {PORT}")
+    server.serve_forever()
+PYCHK
+
+                chmod +x /opt/darkzsaid/bin/checkuser_server.py
+
+                cat > /etc/systemd/system/darkzsaid-checkuser.service <<SERVICE
+[Unit]
+Description=DarkZsaid CheckUser API
+After=network.target
+
+[Service]
+Type=simple
+Environment=CHECKUSER_PORT=${puerto}
+ExecStart=/usr/bin/python3 /opt/darkzsaid/bin/checkuser_server.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+                iptables -D INPUT -p tcp --dport "$puerto" -j ACCEPT 2>/dev/null || true
+                iptables -I INPUT -p tcp --dport "$puerto" -j ACCEPT
+                ufw allow "$puerto"/tcp >/dev/null 2>&1 || true
+
+                systemctl daemon-reload
+                systemctl enable darkzsaid-checkuser >/dev/null 2>&1
+                systemctl restart darkzsaid-checkuser
+
+                sleep 1
+
+                echo ""
+                if systemctl is-active --quiet darkzsaid-checkuser 2>/dev/null; then
+                    echo -e "${VERDE}${BOLD}✔ CheckUser API activado correctamente.${RESET}"
+                    echo -e "${AMARILLO}URL:${RESET} ${BLANCO}http://${IP_PUBLICA}:${puerto}/checkUser?user=USUARIO&pass=CLAVE${RESET}"
+                else
+                    echo -e "${ROJO}No se pudo activar CheckUser API.${RESET}"
+                    systemctl status darkzsaid-checkuser --no-pager -l | head -20
+                fi
+
+                echo ""
+                read -r -p "Presiona ENTER para continuar..."
+                ;;
+
+            2|02)
+                systemctl stop darkzsaid-checkuser 2>/dev/null || true
+                echo -e "${AMARILLO}CheckUser detenido.${RESET}"
+                read -r -p "Presiona ENTER para continuar..."
+                ;;
+
+            3|03)
+                systemctl restart darkzsaid-checkuser 2>/dev/null || true
+                echo -e "${VERDE}CheckUser reiniciado.${RESET}"
+                read -r -p "Presiona ENTER para continuar..."
+                ;;
+
+            4|04)
+                echo ""
+                echo -e "${AMARILLO}URL base:${RESET} ${BLANCO}http://${IP_PUBLICA}:${PUERTO_CHK}/checkUser${RESET}"
+                echo -e "${AMARILLO}Ejemplo:${RESET} ${BLANCO}http://${IP_PUBLICA}:${PUERTO_CHK}/checkUser?user=USUARIO&pass=CLAVE${RESET}"
+                echo ""
+                read -r -p "Usuario para probar: " utest
+                read -r -p "Contraseña para probar: " ptest
+                echo ""
+                curl -s "http://127.0.0.1:${PUERTO_CHK}/checkUser?user=${utest}&pass=${ptest}" || true
+                echo ""
+                read -r -p "Presiona ENTER para continuar..."
+                ;;
+
+            5|05)
+                systemctl disable --now darkzsaid-checkuser 2>/dev/null || true
+                rm -f /etc/systemd/system/darkzsaid-checkuser.service
+                systemctl daemon-reload
+                echo -e "${ROJO}CheckUser removido.${RESET}"
+                read -r -p "Presiona ENTER para continuar..."
+                ;;
+
+            0|00)
+                return
+                ;;
+
+            *)
+                echo "Opción inválida."
+                sleep 1
+                ;;
+        esac
+    done
+}
+
+
 
 dz_borrar_1_user_directo_final() {
     bash /opt/darkzsaid/menus/eliminar_usuarios_full.sh one
@@ -1336,6 +1708,7 @@ menu_users() {
         echo -e "${ROJO}[05]${RESET} ${CYAN}➜${RESET} ${BLANCO}MOSTRAR USUARIOS CONECTADOS${RESET}"
         echo -e "${ROJO}[06]${RESET} ${CYAN}➜${RESET} ${BLANCO}BACKUP USUARIOS${RESET}"
         echo -e "${ROJO}[07]${RESET} ${CYAN}➜${RESET} ${BLANCO}RESTAURAR BACKUP USUARIOS${RESET}"
+        echo -e "${ROJO}[08]${RESET} ${CYAN}➜${RESET} ${BLANCO}CHECK USER API${RESET}"
         echo ""
         echo -e "${ROJO}[00]${RESET} ${CYAN}➜${RESET} ${ROJO}[ VOLVER ]${RESET}"
 
@@ -1349,7 +1722,8 @@ menu_users() {
             5|05) usuarios_conectados ;;
             6|06) backup_usuarios ;;
             7|07) restaurar_backup_usuarios ;;
-            0|00) return ;;
+                    8|08) checkuser_protocolo_menu ;;
+0|00) return ;;
             *) opcion_mala ;;
         esac
     done

@@ -1,40 +1,39 @@
-# Configuración real
-.env
-*.env
-config.env
-bot/.env
 
-# Claves y certificados
-*.key
-*.pem
-*.crt
-
-# Logs, backups y temporales
-logs/
-backups/
-*.log
-*.bak*
-*.roto*
-*.tmp*
-*.tar.gz
-*.zip
-
-# Datos reales de usuarios/tokens
-data/*
 !data/README.md
-
-users/*
+!sipvpn-activex/etc_zivpn/README.md
 !users/README.md
-
+# Claves y certificados
+# Configuración real
+# Datos reales de usuarios/tokens
+# Logs, backups y temporales
 # ZIVPN/SIPVPN datos reales
-sipvpn-activex/etc_zivpn/config.json
-sipvpn-activex/etc_zivpn/users.json
+*.bak*
+*.crt
+*.env
+*.key
+*.log
+*.pem
+*.roto*
+*.tar.gz
+*.tmp
+*.tmp*
+*.zip
+.env
+backups/
+bot/.env
+config.env
+data/
+data/*
+files/data/*.db
+logs/
+sipvpn-activex/etc_zivpn/*.crt
+sipvpn-activex/etc_zivpn/*.key
+sipvpn-activex/etc_zivpn/*.pem
 sipvpn-activex/etc_zivpn/claves_fecha.txt
+sipvpn-activex/etc_zivpn/config.json
+sipvpn-activex/etc_zivpn/data
 sipvpn-activex/etc_zivpn/keys_expire.db
 sipvpn-activex/etc_zivpn/temp.json
-sipvpn-activex/etc_zivpn/data
-sipvpn-activex/etc_zivpn/*.key
-sipvpn-activex/etc_zivpn/*.crt
-sipvpn-activex/etc_zivpn/*.pem
+sipvpn-activex/etc_zivpn/users.json
 sipvpn-activex/etc_zivpn/zivpn/
-!sipvpn-activex/etc_zivpn/README.md
+users/*
