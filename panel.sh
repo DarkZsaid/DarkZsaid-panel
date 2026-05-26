@@ -2621,17 +2621,13 @@ RAYA="${CYAN}◆═════════════════════�
 
         case "$op" in
             1|01)
-                if [[ -f /opt/darkzsaid/menus/users_menu.sh ]]; then
-                    bash /opt/darkzsaid/menus/users_menu.sh
-                elif declare -F users_menu >/dev/null; then
-                    users_menu
-                elif declare -F menu_usuarios >/dev/null; then
-                    menu_usuarios
+                if [[ -x /opt/darkzsaid/menus/control_usuarios.sh ]]; then
+                    bash /opt/darkzsaid/menus/control_usuarios.sh
                 else
-                    echo "No se encontró menú de usuarios."
-                    read -p "ENTER..."
+                    echo "No se encontró /opt/darkzsaid/menus/control_usuarios.sh"
+                    read -rp "Presiona ENTER para volver..."
                 fi
-            ;;
+                ;;
 
             2|02)
                 if declare -F menu_instaladores >/dev/null; then
