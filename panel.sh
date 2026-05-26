@@ -152,7 +152,12 @@ case "$op" in
             bash /opt/darkzsaid/socks_ws_menu.sh
             ;;
             6|06)
-                bash /opt/darkzsaid/menus/extras_telegram_checkuser.sh
+                if [[ -x /opt/darkzsaid/menus/extras_telegram_checkuser.sh ]]; then
+                    bash /opt/darkzsaid/menus/extras_telegram_checkuser.sh
+                else
+                    echo "No se encontró /opt/darkzsaid/menus/extras_telegram_checkuser.sh"
+                    read -rp "Presiona ENTER para volver..."
+                fi
                 ;;
         7|07) bash /opt/darkzsaid/menus/configurar_nombre_panel.sh ;;
 
@@ -1117,12 +1122,34 @@ menu_puertos() {
 }
 
 menu_bot() {
-    if [[ -x /opt/darkzsaid/menus/extras_telegram_checkuser.sh ]]; then
-        bash /opt/darkzsaid/menus/extras_telegram_checkuser.sh
-    else
-        echo "No se encontró /opt/darkzsaid/menus/extras_telegram_checkuser.sh"
-        read -rp "Presiona ENTER para volver..."
-    fi
+    while true; do
+        titulo "BOT TELEGRAM OPCIONAL"
+
+        echo -e "${ROJO}[1]${RESET} ${AZUL}ACTIVAR / CONFIGURAR BOT TELEGRAM${RESET}"
+        echo -e "${ROJO}[2]${RESET} ${AZUL}INICIAR BOT${RESET}              $(estado_servicio darkzsaid-bot)"
+        echo -e "${ROJO}[3]${RESET} ${AZUL}DETENER BOT${RESET}"
+        echo -e "${ROJO}[4]${RESET} ${AZUL}REINICIAR BOT${RESET}"
+        echo -e "${ROJO}[5]${RESET} ${AZUL}ESTADO BOT${RESET}"
+        echo -e "${ROJO}[6]${RESET} ${AZUL}VER LOGS BOT${RESET}"
+        echo -e "${ROJO}[7]${RESET} ${AZUL}CAMBIAR TOKEN / ID ADMIN${RESET}"
+        echo -e "${ROJO}[8]${RESET} ${AZUL}DESACTIVAR BOT${RESET}"
+        echo -e "${ROJO}[0]${RESET} ${BLANCO}VOLVER${RESET}"
+        echo ""
+        read -p "Opción: " op
+
+        case "$op" in
+            1) activar_bot_telegram ;;
+            2) systemctl start darkzsaid-bot 2>/dev/null; pausa ;;
+            3) systemctl stop darkzsaid-bot 2>/dev/null; pausa ;;
+            4) systemctl restart darkzsaid-bot 2>/dev/null; pausa ;;
+            5) systemctl status darkzsaid-bot --no-pager 2>/dev/null; pausa ;;
+            6) journalctl -u darkzsaid-bot -n 80 --no-pager 2>/dev/null; pausa ;;
+            7) configurar_bot_telegram ;;
+            8) desactivar_bot_telegram ;;
+            0) return ;;
+            *) echo "Opción inválida"; sleep 1 ;;
+        esac
+    done
 }
 
 activar_bot_telegram() {
@@ -2632,7 +2659,7 @@ RAYA="${CYAN}◆═════════════════════�
         printf "%b
 " "${BLANCO}<3>${RESET} 🛠  ${BLANCO}HERRAMIENTAS${RESET}    ${BLANCO}<5>${RESET} ✚ ${BLANCO}PUERTOS${RESET}"
         printf "%b
-" "${BLANCO}<6>${RESET} ◆  ${BLANCO}BOT TELEGRAM${RESET}    ${BLANCO}<7>${RESET} ⚙ ${BLANCO}LOGO SUPERIOR${RESET}"
+" "${BLANCO}<6>${RESET} ◆  ${BLANCO}EXTRAS BOT${RESET}    ${BLANCO}<7>${RESET} ⚙ ${BLANCO}LOGO SUPERIOR${RESET}"
         printf "%b
 " "${CYAN} ◈ Version: ${CYAN}${PANEL_VERSION}${RESET} ${CYAN}◈${RESET}"
         echo -e "$RAYA"
@@ -2652,13 +2679,17 @@ RAYA="${CYAN}◆═════════════════════�
 
         case "$op" in
             1|01)
-                if [[ -x /opt/darkzsaid/menus/control_usuarios.sh ]]; then
-                    bash /opt/darkzsaid/menus/control_usuarios.sh
+                if [[ -f /opt/darkzsaid/menus/users_menu.sh ]]; then
+                    bash /opt/darkzsaid/menus/users_menu.sh
+                elif declare -F users_menu >/dev/null; then
+                    users_menu
+                elif declare -F menu_usuarios >/dev/null; then
+                    menu_usuarios
                 else
-                    echo "No se encontró /opt/darkzsaid/menus/control_usuarios.sh"
-                    read -rp "Presiona ENTER para volver..."
+                    echo "No se encontró menú de usuarios."
+                    read -p "ENTER..."
                 fi
-                ;;
+            ;;
 
             2|02)
                 if declare -F menu_instaladores >/dev/null; then
@@ -2691,14 +2722,9 @@ RAYA="${CYAN}◆═════════════════════�
                 fi
             ;;
 
-            6|06)
-                if declare -F menu_bot >/dev/null; then
-                    menu_bot
-                else
-                    echo "No se encontró menú bot."
-                    read -p "ENTER..."
-                fi
-            ;;
+            6)
+                bash /opt/darkzsaid/menus/extras_bot_banner_checkuser.sh
+                ;;
 
             7|07)
                 bash /opt/darkzsaid/menus/configurar_nombre_panel.sh 2>/dev/null || {
