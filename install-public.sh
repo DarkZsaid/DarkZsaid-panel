@@ -233,3 +233,66 @@ echo -e "${BLANCO}${BOLD}Protocolos extra:${RESET} ${AMARILLO}apagados hasta act
 echo ""
 echo -e "${AMARILLO}Log completo:${RESET} $LOG"
 echo ""
+
+# ===== DARKZSAID RUNTIME SERVICES AUTO-RESTORE =====
+echo
+echo "===== RESTAURANDO SERVICIOS RUNTIME DARKZSAID ====="
+
+APP_DIR="${APP_DIR:-/opt/darkzsaid}"
+
+# UDPMod motor/config
+if [ -f "$APP_DIR/backup_runtime/udpmod/config.json" ]; then
+  mkdir -p /etc/udpmod
+  cp -f "$APP_DIR/backup_runtime/udpmod/config.json" /etc/udpmod/config.json
+  chmod 644 /etc/udpmod/config.json
+fi
+
+if [ -f "$APP_DIR/backup_runtime/udpmod/udpmod.service" ]; then
+  cp -f "$APP_DIR/backup_runtime/udpmod/udpmod.service" /etc/systemd/system/udpmod.service
+  chmod 644 /etc/systemd/system/udpmod.service
+fi
+
+if [ -f "$APP_DIR/backup_runtime/udpmod/darkzsaid-udpmod-redirect.service" ]; then
+  cp -f "$APP_DIR/backup_runtime/udpmod/darkzsaid-udpmod-redirect.service" /etc/systemd/system/darkzsaid-udpmod-redirect.service
+  chmod 644 /etc/systemd/system/darkzsaid-udpmod-redirect.service
+fi
+
+# ZiVPN
+if [ -f "$APP_DIR/files/bin/zivpn" ]; then
+  cp -f "$APP_DIR/files/bin/zivpn" /usr/local/bin/zivpn
+  chmod +x /usr/local/bin/zivpn
+fi
+
+if [ -f "$APP_DIR/backup_runtime/zivpn/zivpn.service" ]; then
+  cp -f "$APP_DIR/backup_runtime/zivpn/zivpn.service" /etc/systemd/system/zivpn.service
+  chmod 644 /etc/systemd/system/zivpn.service
+fi
+
+systemctl daemon-reload
+
+# Encender UDPMod si existe
+if [ -f /etc/systemd/system/udpmod.service ]; then
+  systemctl enable udpmod.service >/dev/null 2>&1 || true
+  systemctl restart udpmod.service >/dev/null 2>&1 || true
+fi
+
+# Encender redirect UDPMod si existe
+if [ -f /etc/systemd/system/darkzsaid-udpmod-redirect.service ]; then
+  systemctl enable darkzsaid-udpmod-redirect.service >/dev/null 2>&1 || true
+  systemctl restart darkzsaid-udpmod-redirect.service >/dev/null 2>&1 || true
+fi
+
+# Encender ZiVPN si existe
+if [ -f /etc/systemd/system/zivpn.service ]; then
+  systemctl enable zivpn.service >/dev/null 2>&1 || true
+  systemctl restart zivpn.service >/dev/null 2>&1 || true
+fi
+
+echo "===== VERIFICANDO SERVICIOS ====="
+systemctl is-active udpmod.service >/dev/null 2>&1 && echo "✅ UDPMod activo" || echo "⚠️ UDPMod no activo"
+systemctl is-active zivpn.service >/dev/null 2>&1 && echo "✅ ZiVPN activo" || echo "⚠️ ZiVPN no activo"
+systemctl is-active darkzsaid-udpmod-redirect.service >/dev/null 2>&1 && echo "✅ Redirect UDPMod activo" || echo "⚠️ Redirect UDPMod no activo"
+
+echo "===== PUERTOS UDP ====="
+ss -lunpt | grep -E "36712|5667|6000|19999|zivpn|hysteria" || true
+# ===== END DARKZSAID RUNTIME SERVICES AUTO-RESTORE =====

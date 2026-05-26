@@ -5,9 +5,7 @@
   "obfs": "DarkZsaid",
   "auth": {
     "mode": "passwords",
-    "config": [
-      "steven:2026"
-    ]
+    "config": []
   },
   "disable_udp": false,
   "alpn": "",
