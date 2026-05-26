@@ -118,16 +118,23 @@ echo -e "${RESET}"
     [[ -n "$PUERTO_BADVPN1" || -n "$PUERTO_BADVPN2" ]] && echo -e "${CYAN} ◈${RESET} BadVPN:7200 ${CYAN}◆${RESET} ${PUERTO_BADVPN1:-${ROJO}OFF${RESET}}    ${CYAN}◈${RESET} BadVPN:7300 ${CYAN}◆${RESET} ${PUERTO_BADVPN2:-${ROJO}OFF${RESET}}"
     echo -e "$RAYA"
 
-    printf "%b\n" "${BLANCO}\<1\>${RESET} ⚡ ${BLANCO}USUARIOS${RESET}          ${BLANCO}\<2\>${RESET} 📡 ${BLANCO}PROTOCOLOS${RESET}"
-    printf "%b\n" "${BLANCO}\<3\>${RESET} 🛠  ${BLANCO}HERRAMIENTAS${RESET}    ${BLANCO}\<5\>${RESET} ✚ ${BLANCO}PUERTOS${RESET}"
-    printf "%b\n" "${BLANCO}\<6\>${RESET} ◆  ${BLANCO}BOT TELEGRAM${RESET}    ${BLANCO}\<7\>${RESET} ⚙ ${BLANCO}NOMBRE PANEL${RESET}"
-    printf "%b\n" "${CYAN} ◈ Version: ${VERDE}${PANEL_VERSION:-v1.0}${RESET} ${CYAN}◈${RESET}"
+    printf "%b
+" "${BLANCO}\<1\>${RESET} ⚡ ${BLANCO}USUARIOS${RESET}          ${BLANCO}\<2\>${RESET} 📡 ${BLANCO}PROTOCOLOS${RESET}"
+    printf "%b
+" "${BLANCO}\<3\>${RESET} 🛠  ${BLANCO}HERRAMIENTAS${RESET}    ${BLANCO}\<5\>${RESET} ✚ ${BLANCO}PUERTOS${RESET}"
+    printf "%b
+" "${BLANCO}\<6\>${RESET} ◆  ${BLANCO}BOT TELEGRAM${RESET}    ${BLANCO}\<7\>${RESET} ⚙ ${BLANCO}NOMBRE PANEL${RESET}"
+    printf "%b
+" "${CYAN} ◈ Version: ${VERDE}${PANEL_VERSION:-v1.0}${RESET} ${CYAN}◈${RESET}"
     echo -e "$RAYA"
 
-    printf "%b\n" "${BLANCO}\<08\>${RESET} 💻 ${AMARILLO}ACTUALIZAR${RESET}      ${BLANCO}\<9\>${RESET} 🗑 ${ROJO}DESINSTALAR${RESET}"
-    printf "%b\n" "${BLANCO}\<99\>${RESET} 🔄 ${AMARILLO}REBOOT${RESET}"
+    printf "%b
+" "${BLANCO}\<08\>${RESET} 💻 ${AMARILLO}ACTUALIZAR${RESET}      ${BLANCO}\<9\>${RESET} 🗑 ${ROJO}DESINSTALAR${RESET}"
+    printf "%b
+" "${BLANCO}\<99\>${RESET} 🔄 ${AMARILLO}REBOOT${RESET}"
     echo -e "$RAYA"
-    printf "%b\n" "${BLANCO}\<0\>${RESET} ❌ ${ROJO}SALIR${RESET}"
+    printf "%b
+" "${BLANCO}\<0\>${RESET} ❌ ${ROJO}SALIR${RESET}"
     echo -e "$RAYA"
     echo ""
     read -p "Opción: " op
@@ -144,9 +151,9 @@ case "$op" in
         5|05)
             bash /opt/darkzsaid/socks_ws_menu.sh
             ;;
-        6|06)
-            bash /opt/darkzsaid/menus/dropbear_menu.sh
-            ;;
+            6|06)
+                bash /opt/darkzsaid/menus/extras_telegram_checkuser.sh
+                ;;
         7|07) bash /opt/darkzsaid/menus/configurar_nombre_panel.sh ;;
 
 
@@ -603,23 +610,35 @@ def build_response(code: str, header: str, banner: str) -> bytes:
     reason = reasons.get(code, "Connection Established")
 
     if header and header != "DEFAULT_HOST":
-        return header.replace("\\r", "\r").replace("\\n", "\n").encode()
+        return header.replace("\\r", "\r").replace("\
+", "
+").encode()
 
     if code == "101":
         return (
-            "HTTP/1.1 101 Switching Protocols\r\n"
-            "Upgrade: websocket\r\n"
-            "Connection: Upgrade\r\n"
-            f"Server: {banner}\r\n"
-            "\r\n"
+            "HTTP/1.1 101 Switching Protocols\r
+"
+            "Upgrade: websocket\r
+"
+            "Connection: Upgrade\r
+"
+            f"Server: {banner}\r
+"
+            "\r
+"
         ).encode()
 
     return (
-        f"HTTP/1.1 {code} {reason}\r\n"
-        f"Server: {banner}\r\n"
-        "Connection: established\r\n"
-        "Content-Length: 0\r\n"
-        "\r\n"
+        f"HTTP/1.1 {code} {reason}\r
+"
+        f"Server: {banner}\r
+"
+        "Connection: established\r
+"
+        "Content-Length: 0\r
+"
+        "\r
+"
     ).encode()
 
 def pipe(client, remote):
@@ -850,7 +869,12 @@ agregar_puerto_ws() {
     echo -e "${BLANCO}ENCABEZADO PERSONALIZADO${RESET}"
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
     echo "Ejemplo:"
-    echo '\r\nContent-length: 0\r\n\r\nHTTP/1.1 200 Connection Established\r\n\r\n'
+    echo '\r
+Content-length: 0\r
+\r
+HTTP/1.1 200 Connection Established\r
+\r
+'
     echo ""
     echo "Si desconoces esta opción, solo presiona ENTER."
     read -p "CABECERA [DEFAULT_HOST]: " CUSTOM_HEADER
@@ -1093,34 +1117,12 @@ menu_puertos() {
 }
 
 menu_bot() {
-    while true; do
-        titulo "BOT TELEGRAM OPCIONAL"
-
-        echo -e "${ROJO}[1]${RESET} ${AZUL}ACTIVAR / CONFIGURAR BOT TELEGRAM${RESET}"
-        echo -e "${ROJO}[2]${RESET} ${AZUL}INICIAR BOT${RESET}              $(estado_servicio darkzsaid-bot)"
-        echo -e "${ROJO}[3]${RESET} ${AZUL}DETENER BOT${RESET}"
-        echo -e "${ROJO}[4]${RESET} ${AZUL}REINICIAR BOT${RESET}"
-        echo -e "${ROJO}[5]${RESET} ${AZUL}ESTADO BOT${RESET}"
-        echo -e "${ROJO}[6]${RESET} ${AZUL}VER LOGS BOT${RESET}"
-        echo -e "${ROJO}[7]${RESET} ${AZUL}CAMBIAR TOKEN / ID ADMIN${RESET}"
-        echo -e "${ROJO}[8]${RESET} ${AZUL}DESACTIVAR BOT${RESET}"
-        echo -e "${ROJO}[0]${RESET} ${BLANCO}VOLVER${RESET}"
-        echo ""
-        read -p "Opción: " op
-
-        case "$op" in
-            1) activar_bot_telegram ;;
-            2) systemctl start darkzsaid-bot 2>/dev/null; pausa ;;
-            3) systemctl stop darkzsaid-bot 2>/dev/null; pausa ;;
-            4) systemctl restart darkzsaid-bot 2>/dev/null; pausa ;;
-            5) systemctl status darkzsaid-bot --no-pager 2>/dev/null; pausa ;;
-            6) journalctl -u darkzsaid-bot -n 80 --no-pager 2>/dev/null; pausa ;;
-            7) configurar_bot_telegram ;;
-            8) desactivar_bot_telegram ;;
-            0) return ;;
-            *) echo "Opción inválida"; sleep 1 ;;
-        esac
-    done
+    if [[ -x /opt/darkzsaid/menus/extras_telegram_checkuser.sh ]]; then
+        bash /opt/darkzsaid/menus/extras_telegram_checkuser.sh
+    else
+        echo "No se encontró /opt/darkzsaid/menus/extras_telegram_checkuser.sh"
+        read -rp "Presiona ENTER para volver..."
+    fi
 }
 
 activar_bot_telegram() {
@@ -1246,21 +1248,24 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await deny(update)
         return
     out = run_cmd("systemctl is-active ssh; systemctl is-active ufw; systemctl is-active udpmod; systemctl is-active darkzsaid-bot")
-    await update.message.reply_text(f"📡 Estado:\n{out}")
+    await update.message.reply_text(f"📡 Estado:
+{out}")
 
 async def puertos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(update):
         await deny(update)
         return
     out = run_cmd("ss -tulnp")
-    await update.message.reply_text(f"📌 Puertos activos:\n{out}")
+    await update.message.reply_text(f"📌 Puertos activos:
+{out}")
 
 async def ufw(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(update):
         await deny(update)
         return
     out = run_cmd("ufw status numbered")
-    await update.message.reply_text(f"🧱 UFW:\n{out}")
+    await update.message.reply_text(f"🧱 UFW:
+{out}")
 
 async def datos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(update):
@@ -1310,7 +1315,10 @@ async def crear(update: Update, context: ContextTypes.DEFAULT_TYPE):
     run_cmd(f"useradd -M {user} -s /bin/false -e {fecha}")
     run_cmd(f"echo '{user}:{password}' | chpasswd")
 
-    await update.message.reply_text(f"✅ Usuario creado\nUsuario: {user}\nContraseña: {password}\nExpira: {fecha}")
+    await update.message.reply_text(f"✅ Usuario creado
+Usuario: {user}
+Contraseña: {password}
+Expira: {fecha}")
 
 async def cambiar_pass(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(update):
@@ -1363,7 +1371,8 @@ async def reiniciar_appmods(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await deny(update)
         return
     out = run_cmd("systemctl restart udpmod")
-    await update.message.reply_text(f"🔄 UDP-Hysteria reiniciado.\n{out}")
+    await update.message.reply_text(f"🔄 UDP-Hysteria reiniciado.
+{out}")
 
 async def reiniciar_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(update):
@@ -1377,7 +1386,8 @@ async def logs_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await deny(update)
         return
     out = run_cmd("journalctl -u darkzsaid-bot -n 40 --no-pager")
-    await update.message.reply_text(f"📜 Logs:\n{out}")
+    await update.message.reply_text(f"📜 Logs:
+{out}")
 
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
@@ -1585,8 +1595,10 @@ BRAND = "$MARCA_WS"
 
 def response_200():
     return (
-        "HTTP/1.1 200 Connection established " + BRAND + "\\r\\n"
-        "\\r\\n"
+        "HTTP/1.1 200 Connection established " + BRAND + "\\r\
+"
+        "\\r\
+"
     )
 
 def is_http_payload(data):
@@ -1856,8 +1868,10 @@ BRAND = "$MARCA_WS"
 
 def response_200():
     return (
-        "HTTP/1.1 200 Connection established " + BRAND + "\\r\\n"
-        "\\r\\n"
+        "HTTP/1.1 200 Connection established " + BRAND + "\\r\
+"
+        "\\r\
+"
     )
 
 def is_http_payload(data):
@@ -2124,8 +2138,10 @@ BRAND = "ADM SJCC"
 
 def response_200():
     return (
-        "HTTP/1.1 200 Connection established " + BRAND + "\r\n"
-        "\r\n"
+        "HTTP/1.1 200 Connection established " + BRAND + "\r
+"
+        "\r
+"
     )
 
 def is_http_payload(data):
@@ -2434,7 +2450,10 @@ EOSERVICE
 
     echo ""
     echo -e "${AMARILLO}Respuesta 200 Establish:${RESET}"
-    echo -e "GET / HTTP/1.1\r\nHost: test\r\n\r\n" | nc -w 2 127.0.0.1 80 2>/dev/null || true
+    echo -e "GET / HTTP/1.1\r
+Host: test\r
+\r
+" | nc -w 2 127.0.0.1 80 2>/dev/null || true
 
     echo ""
     echo -e "${VERDE}Método activado correctamente.${RESET}"
@@ -2510,7 +2529,8 @@ menu_principal() {
 RAYA="${CYAN}◆════════════════════════════════════════════════◆${RESET}"
 
         echo -e "$RAYA"
-        printf "%b\n" "${BLANCO}⚡ Gestor VPN/SSH by ${CYAN}${PANEL_AUTHOR}${RESET} ${AMARILLO}◆ ${PANEL_VERSION}${RESET}"
+        printf "%b
+" "${BLANCO}⚡ Gestor VPN/SSH by ${CYAN}${PANEL_AUTHOR}${RESET} ${AMARILLO}◆ ${PANEL_VERSION}${RESET}"
         echo -e "$RAYA"
 
         # Datos del sistema
@@ -2523,8 +2543,10 @@ RAYA="${CYAN}◆═════════════════════�
 
         echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET} ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${AMARILLO}${IP_INFO}${RESET}"
         echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}      ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${AMARILLO}${FECHA_INFO}${RESET}"
-        printf "%b\n" "${CYAN} ◈ RAM:${RESET} ${BLANCO}${RAM_INFO}${RESET}"
-        printf "%b\n" "${CYAN} ◈ Up:${RESET} ${BLANCO}${UPTIME_INFO}${RESET}"
+        printf "%b
+" "${CYAN} ◈ RAM:${RESET} ${BLANCO}${RAM_INFO}${RESET}"
+        printf "%b
+" "${CYAN} ◈ Up:${RESET} ${BLANCO}${UPTIME_INFO}${RESET}"
         echo -e "$RAYA"
 
         # Mostrar SOLO puertos activos
@@ -2593,9 +2615,11 @@ RAYA="${CYAN}◆═════════════════════�
             fi
 
             if [[ -n "$right" ]]; then
-                printf "%b\n" "${left}        ${right}"
+                printf "%b
+" "${left}        ${right}"
             else
-                printf "%b\n" "${left}"
+                printf "%b
+" "${left}"
             fi
 
             i=$((i+2))
@@ -2603,17 +2627,24 @@ RAYA="${CYAN}◆═════════════════════�
 
         echo -e "$RAYA"
 
-        printf "%b\n" "${BLANCO}<1>${RESET} ⚡ ${BLANCO}USUARIOS${RESET}          ${BLANCO}<2>${RESET} 📡 ${BLANCO}PROTOCOLOS${RESET}"
-        printf "%b\n" "${BLANCO}<3>${RESET} 🛠  ${BLANCO}HERRAMIENTAS${RESET}    ${BLANCO}<5>${RESET} ✚ ${BLANCO}PUERTOS${RESET}"
-        printf "%b\n" "${BLANCO}<6>${RESET} ◆  ${BLANCO}BOT TELEGRAM${RESET}    ${BLANCO}<7>${RESET} ⚙ ${BLANCO}LOGO SUPERIOR${RESET}"
-        printf "%b\n" "${CYAN} ◈ Version: ${CYAN}${PANEL_VERSION}${RESET} ${CYAN}◈${RESET}"
+        printf "%b
+" "${BLANCO}<1>${RESET} ⚡ ${BLANCO}USUARIOS${RESET}          ${BLANCO}<2>${RESET} 📡 ${BLANCO}PROTOCOLOS${RESET}"
+        printf "%b
+" "${BLANCO}<3>${RESET} 🛠  ${BLANCO}HERRAMIENTAS${RESET}    ${BLANCO}<5>${RESET} ✚ ${BLANCO}PUERTOS${RESET}"
+        printf "%b
+" "${BLANCO}<6>${RESET} ◆  ${BLANCO}BOT TELEGRAM${RESET}    ${BLANCO}<7>${RESET} ⚙ ${BLANCO}LOGO SUPERIOR${RESET}"
+        printf "%b
+" "${CYAN} ◈ Version: ${CYAN}${PANEL_VERSION}${RESET} ${CYAN}◈${RESET}"
         echo -e "$RAYA"
 
-        printf "%b\n" "${BLANCO}<08>${RESET} 💻 ${AMARILLO}ACTUALIZAR${RESET}      ${BLANCO}<9>${RESET} 🗑 ${ROJO}DESINSTALAR${RESET}"
-        printf "%b\n" "${BLANCO}<99>${RESET} 🔄 ${AMARILLO}REBOOT${RESET}"
+        printf "%b
+" "${BLANCO}<08>${RESET} 💻 ${AMARILLO}ACTUALIZAR${RESET}      ${BLANCO}<9>${RESET} 🗑 ${ROJO}DESINSTALAR${RESET}"
+        printf "%b
+" "${BLANCO}<99>${RESET} 🔄 ${AMARILLO}REBOOT${RESET}"
         echo -e "$RAYA"
 
-        printf "%b\n" "${BLANCO}<0>${RESET} ❌ ${ROJO}SALIR${RESET}"
+        printf "%b
+" "${BLANCO}<0>${RESET} ❌ ${ROJO}SALIR${RESET}"
         echo -e "$RAYA"
         echo ""
 
