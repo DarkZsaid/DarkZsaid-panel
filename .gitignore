@@ -1,39 +1,23 @@
+# Python cache
+__pycache__/
+*.pyc
 
-!data/README.md
-!sipvpn-activex/etc_zivpn/README.md
-!users/README.md
-# Claves y certificados
-# Configuración real
-# Datos reales de usuarios/tokens
-# Logs, backups y temporales
-# ZIVPN/SIPVPN datos reales
-*.bak*
-*.crt
-*.env
-*.key
-*.log
-*.pem
-*.roto*
+# Backups temporales
+*.bak
+*.bak_*
+*.malo_*
+backups_bot/
+backups_solo_3/
 *.tar.gz
-*.tmp
-*.tmp*
-*.zip
-.env
-backups/
-bot/.env
-config.env
-data/
-data/*
-files/data/*.db
-logs/
-sipvpn-activex/etc_zivpn/*.crt
-sipvpn-activex/etc_zivpn/*.key
-sipvpn-activex/etc_zivpn/*.pem
-sipvpn-activex/etc_zivpn/claves_fecha.txt
-sipvpn-activex/etc_zivpn/config.json
-sipvpn-activex/etc_zivpn/data
-sipvpn-activex/etc_zivpn/keys_expire.db
-sipvpn-activex/etc_zivpn/temp.json
-sipvpn-activex/etc_zivpn/users.json
-sipvpn-activex/etc_zivpn/zivpn/
-users/*
+
+# Configs sensibles
+/etc/darkzsaid/bot/bot.conf
+bot.conf
+*.conf.secret
+
+# Logs
+*.log
+
+# Runtime data sensible
+data/admins.db
+data/usuarios.db

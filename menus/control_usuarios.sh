@@ -66,7 +66,7 @@ while true; do
         3) bash /opt/darkzsaid/menus/usuarios_renovar.sh ;;
         4) bash /opt/darkzsaid/menus/usuarios_mostrar.sh ;;
         5) bash /opt/darkzsaid/menus/usuarios_conectados.sh ;;
-        6) bash /opt/darkzsaid/menus/banner_ssh.sh ;;
+        6) bash /opt/darkzsaid/menus/extras_bot_banner_checkuser.sh ;;
         7) bash /opt/darkzsaid/menus/log_consumo.sh ;;
         8) bash /opt/darkzsaid/menus/usuarios_bloquear.sh ;;
         9) bash /opt/darkzsaid/menus/usuarios_backup.sh ;;

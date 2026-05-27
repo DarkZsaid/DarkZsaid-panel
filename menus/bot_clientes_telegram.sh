@@ -1,3 +1,12 @@
+
+estado_botssh_real() {
+    if systemctl is-active --quiet darkzsaid-bot.service; then
+        echo "ON"
+    else
+        echo "OFF"
+    fi
+}
+
 #!/bin/bash
 
 source /opt/darkzsaid/lib/estilo_original.sh
@@ -10,12 +19,10 @@ BOT_PID="/var/run/darkzsaid_bot.pid"
 mkdir -p "$BOT_DIR" /etc/darkzsaid/bot /bin/ejecutar
 
 status_botssh() {
-    if [[ -f "$BOT_PID" ]] && ps -p "$(cat "$BOT_PID" 2>/dev/null)" >/dev/null 2>&1; then
-        echo -e "\033[0;31m[\033[0;32mON\033[0;31m]"
-    elif pgrep -f "darkzsaid_bot.sh" >/dev/null 2>&1; then
-        echo -e "\033[0;31m[\033[0;32mON\033[0;31m]"
+    if systemctl is-active --quiet darkzsaid-bot.service; then
+        echo -e "[0;32m[ON][0m"
     else
-        echo -e "\033[1;31m[OFF]"
+        echo -e "[1;31m[OFF][0m"
     fi
 }
 
@@ -27,10 +34,75 @@ status_whatsapp() {
     fi
 }
 
+
+toggle_botssh() {
+    clear
+    print_center -azu "ACTIVAR / DETENER BOT TELEGRAM"
+
+    if systemctl is-active --quiet darkzsaid-bot.service; then
+        echo -e "${col[5]}Bot Telegram está ON. Deteniendo...${col[0]}"
+        systemctl stop darkzsaid-bot.service >/dev/null 2>&1
+        pkill -f "darkzsaid_bot.py" >/dev/null 2>&1 || true
+        pkill -f "darkzsaid_bot.sh" >/dev/null 2>&1 || true
+        sleep 2
+
+        if systemctl is-active --quiet darkzsaid-bot.service; then
+            msg -ama "No se pudo detener el bot."
+        else
+            msg -verd "Bot Telegram detenido correctamente. [OFF]"
+        fi
+
+        read -rp "Presiona ENTER para volver..."
+        return
+    fi
+
+    echo -e "${col[5]}Bot Telegram está OFF. Para activar configura el acceso.${col[0]}"
+    echo
+
+    read -rp "Token del bot de Telegram: " BOT_TOKEN
+    read -rp "ID Telegram SuperAdmin: " ADMIN_ID
+    read -rp "Contraseña del bot/login: " BOT_PASS
+
+    if [[ -z "$BOT_TOKEN" || -z "$ADMIN_ID" ]]; then
+        msg -ama "Token o ID vacío. No se activó el bot."
+        read -rp "Presiona ENTER para volver..."
+        return
+    fi
+
+    mkdir -p /etc/darkzsaid/bot
+
+    cat > /etc/darkzsaid/bot/bot.conf <<EOF
+BOT_TOKEN="$BOT_TOKEN"
+ADMIN_ID="$ADMIN_ID"
+BOT_LOGIN="$ADMIN_ID"
+BOT_PASS="${BOT_PASS:-DarkZsaid}"
+EOF
+
+    chmod 600 /etc/darkzsaid/bot/bot.conf
+
+    echo -e "${col[5]}Configuración guardada. Iniciando bot...${col[0]}"
+
+    systemctl daemon-reload >/dev/null 2>&1
+    systemctl enable darkzsaid-bot.service >/dev/null 2>&1
+    systemctl restart darkzsaid-bot.service >/dev/null 2>&1
+
+    sleep 2
+
+    if systemctl is-active --quiet darkzsaid-bot.service; then
+        msg -verd "Bot Telegram iniciado correctamente. [ON]"
+        echo -e "${col[3]}Ahora prueba en Telegram: /start${col[0]}"
+    else
+        msg -ama "No se pudo iniciar el bot. Revisa logs."
+        journalctl -u darkzsaid-bot.service -n 20 --no-pager -l
+    fi
+
+    read -rp "Presiona ENTER para volver..."
+}
+
 instalar_botssh() {
     header
     msg -bar3
-    print_center -azu "INSTALAR BotSSH"
+    print_center -azu "ACTIVAR / DETENER BotSSH"
     msg -bar3
 
     [[ -e /bin/ejecutar/TKBot ]] && read -p " TELEGRAM BOT TOKEN: " -e -i "$(cat /bin/ejecutar/TKBot)" tokenxx || read -p " TELEGRAM BOT TOKEN: " tokenxx
@@ -153,7 +225,7 @@ limitar_creadores() {
 desinstalar_botssh() {
     header
     msg -bar3
-    print_center -verm2 "DESINSTALAR BotSSH"
+    print_center -verm2 "DESACTIVAR / DETENER BotSSH"
     msg -bar3
 
     read -rp "Escribe SI para desinstalar BotSSH: " conf
@@ -200,14 +272,14 @@ while true; do
     msg -ama "         INSTALADOR BotSSH | DarkZsaid Plus"
     msg -bar3
 
-    echo -e "\033[0;35m [${cor[2]}01\033[0;35m]\033[0;33m ${flech}${cor[3]} INSTALAR BotSSH ${_pid}"
+    echo -e "\033[0;35m [${cor[2]}01\033[0;35m]\033[0;33m ${flech}${cor[3]} ACTIVAR / DETENER BotSSH ${_pid}"
     echo -e "\033[0;35m [${cor[2]}02\033[0;35m]\033[0;33m ${flech}${cor[3]} Reiniciar BotSSH"
     echo -e "\033[0;35m [${cor[2]}03\033[0;35m]\033[0;33m ${flech}${cor[3]} ACTUALIZAR BINARIO"
     echo -e "\033[0;35m [${cor[2]}04\033[0;35m]\033[0;33m ${flech}${cor[3]} Notificar CREADOS"
     echo -e "\033[0;35m [${cor[2]}05\033[0;35m]\033[0;33m ${flech}${cor[3]} Mostrar Creados Reseller"
     echo -e "\033[0;35m [${cor[2]}06\033[0;35m]\033[0;33m ${flech}${cor[3]} Limitar Creadores"
-    echo -e "\033[0;35m [${cor[2]}07\033[0;35m]\033[0;33m ${flech}\033[1;31m DESINSTALAR BotSSH"
-    echo -e "\033[0;35m [${cor[2]}08\033[0;35m]\033[0;33m ${flech}${cor[3]} INSTALAR BotSSH  WHATSAPP �"
+    echo -e "\033[0;35m [${cor[2]}07\033[0;35m]\033[0;33m ${flech}\033[1;31m DESACTIVAR / DETENER BotSSH"
+    echo -e "\033[0;35m [${cor[2]}08\033[0;35m]\033[0;33m ${flech}${cor[3]} ACTIVAR / DETENER BotSSH  WHATSAPP "
     echo -e "\033[0;35m [${cor[2]}09\033[0;35m]\033[0;33m ${flech}${cor[3]} REACTIVAR BOT WHASTAPP ( ${_wa} )"
     msg -bar3
     echo -e " \033[0;35m [${cor[2]}0\033[0;35m]\033[0;33m ${flech} \033[1;37m\e[3;33m[ REGRESAR ]\e[0m"
@@ -217,7 +289,7 @@ while true; do
 
     case "$selection" in
         0) break ;;
-        1) instalar_botssh ;;
+        1) toggle_botssh ;;
         2) reiniciar_botssh ;;
         3) actualizar_binario ;;
         4) notificar_creados ;;

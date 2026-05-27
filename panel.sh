@@ -1,11 +1,12 @@
 #!/bin/bash
 
 ROJO="\e[1;31m"
-VERDE="\e[1;32m"
+VERDE="\e[1;97m"
 AMARILLO="\e[1;33m"
-AZUL="\e[1;34m"
-CYAN="\e[1;36m"
+AZUL="\e[1;97m"
+CYAN="\e[1;33m"
 BLANCO="\e[1;97m"
+CELESTE="\e[1;36m"
 RESET="\e[0m"
 BOLD="\e[1m"
 
@@ -105,8 +106,8 @@ echo -e "${RESET}"
     echo ""
 
     echo -e "$RAYA"
-        echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET} ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${AMARILLO}${IP_INFO}${RESET}"
-        echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}      ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${AMARILLO}${FECHA_INFO}${RESET}"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET} ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${CELESTE}${IP_INFO}${RESET}"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}      ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${CELESTE}${FECHA_INFO}${RESET}"
         echo -e "${CYAN} ◈${RESET} ${CYAN}RAM:${RESET} ${BLANCO}${RAM_INFO}${RESET}"
         echo -e "${CYAN} ◈${RESET} ${CYAN}Up:${RESET} ${BLANCO}${UPTIME_INFO}${RESET}"
 
@@ -2568,8 +2569,8 @@ RAYA="${CYAN}◆═════════════════════�
         FECHA_INFO=$(date '+%d/%m/%Y-%H:%M')
         UPTIME_INFO=$(uptime -p | sed 's/up //')
 
-        echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET} ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${AMARILLO}${IP_INFO}${RESET}"
-        echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}      ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${AMARILLO}${FECHA_INFO}${RESET}"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET} ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${CELESTE}${IP_INFO}${RESET}"
+        echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}      ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${CELESTE}${FECHA_INFO}${RESET}"
         printf "%b
 " "${CYAN} ◈ RAM:${RESET} ${BLANCO}${RAM_INFO}${RESET}"
         printf "%b
