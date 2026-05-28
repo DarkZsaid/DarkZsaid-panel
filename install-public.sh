@@ -107,21 +107,33 @@ BASHRC
 }
 
 clean_runtime_data() {
-    mkdir -p /opt/darkzsaid/data
-    mkdir -p /etc/adm-lite/userDIR
+  echo "Limpiando clientes y tokens de plantilla..."
 
-    # VPS nueva = sin clientes copiados
-    : > /opt/darkzsaid/data/usuarios_ssh.db
-    : > /opt/darkzsaid/data/tokens_zivpn.db
-    : > /opt/darkzsaid/data/udpmod_users.db
+  mkdir -p /opt/darkzsaid/data
 
-    # contraseña global token default, interna
-    echo "Steve2012" > /opt/darkzsaid/data/token_global.pass
-    chmod 600 /opt/darkzsaid/data/token_global.pass
+  # Bases/runtime limpias para VPS nueva
+  : > /opt/darkzsaid/data/usuarios_ssh.db
+  : > /opt/darkzsaid/data/usuarios_udpmod.db
+  : > /opt/darkzsaid/data/udpmod_users.db
+  : > /opt/darkzsaid/data/tokens_zivpn.db
 
-    # limpiar userDIR runtime
-    find /etc/adm-lite/userDIR -type f -delete 2>/dev/null || true
+  # NO sobrescribir token_global.pass si ya existe.
+  # Cada app/cliente puede usar una contraseña token diferente.
+  if [ ! -f /opt/darkzsaid/data/token_global.pass ]; then
+    if [ -f "$APP_DIR/data/token_global.pass" ]; then
+      cp -f "$APP_DIR/data/token_global.pass" /opt/darkzsaid/data/token_global.pass
+    else
+      touch /opt/darkzsaid/data/token_global.pass
+    fi
+  fi
+
+  chmod 600 /opt/darkzsaid/data/*.db 2>/dev/null || true
+  chmod 600 /opt/darkzsaid/data/token_global.pass 2>/dev/null || true
+
+  # Limpiar usuarios heredados de ADM si existieran
+  find /etc/adm-lite/userDIR -type f -delete 2>/dev/null || true
 }
+
 
 default_ports_only() {
     # Default limpio: SSH 22 y DNS 53.
