@@ -258,9 +258,18 @@ if [ -f "$APP_DIR/backup_runtime/udpmod/darkzsaid-udpmod-redirect.service" ]; th
 fi
 
 # ZiVPN
+# Copiar binario ZiVPN a las 2 rutas posibles:
+# 1) /usr/local/bin/zivpn
+# 2) /opt/darkzsaid/sipvpn-activex/ZiVPN
 if [ -f "$APP_DIR/files/bin/zivpn" ]; then
+  mkdir -p /usr/local/bin
+  mkdir -p "$APP_DIR/sipvpn-activex"
+
   cp -f "$APP_DIR/files/bin/zivpn" /usr/local/bin/zivpn
   chmod +x /usr/local/bin/zivpn
+
+  cp -f "$APP_DIR/files/bin/zivpn" "$APP_DIR/sipvpn-activex/ZiVPN"
+  chmod +x "$APP_DIR/sipvpn-activex/ZiVPN"
 fi
 
 if [ -f "$APP_DIR/backup_runtime/zivpn/zivpn.service" ]; then
