@@ -70,6 +70,7 @@ estado_stunnel() {
 reiniciar_stunnel() {
   titulo_stunnel
   echo -e "${AMARILLO}Reiniciando Stunnel SSL...${RESET}"
+  open_ssl_443_firewall
   systemctl restart darkzsaid-stunnel 2>/dev/null || bash "$FIX"
   sleep 1
   systemctl status darkzsaid-stunnel --no-pager 2>/dev/null || true
