@@ -1,4 +1,27 @@
 #!/bin/bash
+
+open_ssl_443_firewall() {
+  echo -e "${CYAN:-}Abriendo puerto SSL/TLS 443...${RESET:-}"
+
+  # UFW si existe
+  if command -v ufw >/dev/null 2>&1; then
+    ufw allow 443/tcp >/dev/null 2>&1 || true
+  fi
+
+  # iptables directo
+  if command -v iptables >/dev/null 2>&1; then
+    iptables -D INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
+    iptables -I INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
+  fi
+
+  # Guardar reglas si existe soporte
+  if command -v netfilter-persistent >/dev/null 2>&1; then
+    netfilter-persistent save >/dev/null 2>&1 || true
+  elif command -v iptables-save >/dev/null 2>&1 && [ -d /etc/iptables ]; then
+    iptables-save > /etc/iptables/rules.v4 2>/dev/null || true
+  fi
+}
+
 source /opt/darkzsaid/menus/ui_instalacion.sh 2>/dev/null || true
 
 ROJO="\e[31m"
