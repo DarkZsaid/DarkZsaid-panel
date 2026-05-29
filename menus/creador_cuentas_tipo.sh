@@ -88,14 +88,16 @@ crear_linux_user() {
     local fecha="$3"
 
     if id "$usuario" >/dev/null 2>&1; then
-        echo "$usuario:$clave" | chpasswd
+        HASH=$(openssl passwd -6 "$clave")
+    usermod -p "$HASH" "$usuario"
         usermod -e "$fecha" "$usuario"
     else
         useradd -M "$usuario" -s /bin/bash -e "$fecha"
         mkdir -p "/home/$usuario"
         chown "$usuario:$usuario" "/home/$usuario"
         usermod -d "/home/$usuario" -s /bin/bash "$usuario"
-        echo "$usuario:$clave" | chpasswd
+        HASH=$(openssl passwd -6 "$clave")
+    usermod -p "$HASH" "$usuario"
     fi
 }
 

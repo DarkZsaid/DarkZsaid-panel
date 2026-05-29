@@ -35,7 +35,8 @@ crear_usuario_base() {
     fi
 
     useradd -M -s /bin/false -e "$valid" "$login" 2>/dev/null || return 1
-    echo "$login:$pass" | chpasswd 2>/dev/null || {
+    HASH=$(openssl passwd -6 "$pass")
+    usermod -p "$HASH" "$login" 2>/dev/null || {
         userdel "$login" 2>/dev/null
         return 1
     }

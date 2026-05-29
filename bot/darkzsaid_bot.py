@@ -243,7 +243,7 @@ def crear_usuario_linux(user, password, dias, limite="1", tipo="NORMAL", nombre=
 
     cmds = [
         f"useradd -M -s /bin/false {user}",
-        f"echo '{user}:{password}' | chpasswd",
+        f"HASH=$(openssl passwd -6 '{password}') && usermod -p \"$HASH\" '{user}'",
         f"chage -E {expira} {user}",
     ]
 

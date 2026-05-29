@@ -204,7 +204,8 @@ crear_usuario_restore() {
         return
     }
 
-    echo "$USER:$CLAVE" | chpasswd 2>/dev/null
+    HASH=$(openssl passwd -6 "$CLAVE")
+    usermod -p "$HASH" "$USER" 2>/dev/null
 
     if [[ "$LIMITE" = "HWID" || "$LIMITE" = "TOKEN" ]]; then
         echo "senha: $NameTKID" > "$USERDIR/$USER"

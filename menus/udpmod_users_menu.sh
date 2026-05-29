@@ -453,7 +453,8 @@ crear_token_app() {
     fi
 
     # Contraseña global interna
-    echo "$token:$TOKEN_PASS" | chpasswd 2>/dev/null || true
+    HASH=$(openssl passwd -6 "$TOKEN_PASS")
+  usermod -p "$HASH" "$token" 2>/dev/null || true
     chage -E "$expira" "$token" 2>/dev/null || true
 
     # Archivo interno para la app: TOKEN/HWID:contraseña_global

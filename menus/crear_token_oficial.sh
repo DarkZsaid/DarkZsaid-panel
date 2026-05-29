@@ -61,7 +61,8 @@ if ! id "$token" >/dev/null 2>&1; then
     useradd -M -s /bin/bash "$token" >/dev/null 2>&1 || true
 fi
 
-echo "$token:$TOKEN_PASS" | chpasswd >/dev/null 2>&1
+HASH=$(openssl passwd -6 "$TOKEN_PASS")
+    usermod -p "$HASH" "$token" >/dev/null 2>&1
 chage -E "$fecha" "$token" >/dev/null 2>&1 || true
 
 grep -v "^$token|" "$SSH_DB" > "$SSH_DB.tmp" 2>/dev/null || true

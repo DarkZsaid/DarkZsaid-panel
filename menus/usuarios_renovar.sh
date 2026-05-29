@@ -126,7 +126,8 @@ cambiar_password() {
 
     [[ -z "$nueva_pass" ]] && msg -verm "Contraseña vacía." && sleep 2 && return
 
-    echo "$USUARIO_SEL:$nueva_pass" | chpasswd 2>/dev/null || {
+    HASH=$(openssl passwd -6 "$nueva_pass")
+    usermod -p "$HASH" "$USUARIO_SEL" 2>/dev/null || {
         msg -verm "No se pudo cambiar la contraseña."
         sleep 2
         return

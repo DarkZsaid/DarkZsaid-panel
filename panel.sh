@@ -213,7 +213,8 @@ crear_usuario_ssh() {
     fecha=$(date -d "+$dias days" +%Y-%m-%d 2>/dev/null)
 
     useradd -M "$user" -s /bin/false -e "$fecha"
-    echo "$user:$pass" | chpasswd
+    HASH=$(openssl passwd -6 "$pass")
+    usermod -p "$HASH" "$user"
 
     echo ""
     echo -e "${VERDE}Usuario creado correctamente.${RESET}"
@@ -253,7 +254,8 @@ menu_usuarios() {
             3)
                 read -p "Usuario: " user
                 read -p "Nueva contraseña: " pass
-                echo "$user:$pass" | chpasswd
+                HASH=$(openssl passwd -6 "$pass")
+    usermod -p "$HASH" "$user"
                 echo "Contraseña cambiada."
                 pausa
                 ;;
@@ -1341,7 +1343,8 @@ async def crear(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fecha = (datetime.now() + timedelta(days=dias_int)).strftime("%Y-%m-%d")
 
     run_cmd(f"useradd -M {user} -s /bin/false -e {fecha}")
-    run_cmd(f"echo '{user}:{password}' | chpasswd")
+    run_cmd(f"HASH=$(openssl passwd -6 "{password}")
+        usermod -p "$HASH" "{user}"")
 
     await update.message.reply_text(f"✅ Usuario creado
 Usuario: {user}
@@ -1358,7 +1361,8 @@ async def cambiar_pass(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     user, password = context.args
-    run_cmd(f"echo '{user}:{password}' | chpasswd")
+    run_cmd(f"HASH=$(openssl passwd -6 "{password}")
+        usermod -p "$HASH" "{user}"")
     await update.message.reply_text(f"✅ Password cambiada para {user}")
 
 async def bloquear(update: Update, context: ContextTypes.DEFAULT_TYPE):
