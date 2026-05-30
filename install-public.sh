@@ -66,7 +66,7 @@ install_base() {
 clone_panel() {
     rm -rf /opt/darkzsaid
     git clone https://github.com/DarkZsaid/DarkZsaid-panel.git /opt/darkzsaid || \
-    git clone https://github.com/stevenjosecarcamo-star/DarkZsaid--panel.git /opt/darkzsaid
+    git clone https://github.com/DarkZsaid/DarkZsaid-panel.git /opt/darkzsaid
 }
 
 fix_permissions() {
