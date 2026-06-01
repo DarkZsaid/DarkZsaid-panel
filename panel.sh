@@ -164,7 +164,7 @@ case "$op" in
 
 
 
-            98)
+        9|09)
                 bash /opt/darkzsaid/menus/uninstall_darkzsaid.sh
                 exit 0
                 ;;
