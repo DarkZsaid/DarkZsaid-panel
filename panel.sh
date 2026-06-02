@@ -1,12 +1,12 @@
 #!/bin/bash
 
 ROJO="\e[1;31m"
-VERDE="\e[1;97m"
-AMARILLO="\e[1;33m"
-AZUL="\e[1;97m"
-CYAN="\e[1;33m"
+VERDE="\e[1;36m"
+AMARILLO="\e[1;35m"
+AZUL="\e[1;37m"
+CYAN="\e[1;36m"
 BLANCO="\e[1;97m"
-CELESTE="\e[1;36m"
+CELESTE="\e[1;34m"
 RESET="\e[0m"
 BOLD="\e[1m"
 
@@ -23,7 +23,7 @@ pausa() {
 }
 
 titulo() {
-    clear
+    printf '\033c'
     echo -e "$LINEA"
     echo -e "${BLANCO}${BOLD}                 $1${RESET}"
     echo -e "$LINEA"
@@ -52,7 +52,7 @@ info_vps() {
 
 
 mostrar_puertas_activas_panel() {
-    echo -e "${AMARILLO}*     clear
+    echo -e "${AMARILLO}*     printf '\033c'
 
     PANEL_NAME="DARKZSAID"
     PANEL_AUTHOR="@DarkZsaid"
@@ -168,6 +168,8 @@ case "$op" in
                 bash /opt/darkzsaid/menus/uninstall_darkzsaid.sh
                 exit 0
                 ;;
+        10)
+            ;;
             99) reboot ;;
             0) clear; exit ;;
             *) echo "Opción inválida"; sleep 1 ;;
@@ -2423,7 +2425,7 @@ remover_ssh_ws_permanente() {
 }
 
 instalar_sockpython_200_establish() {
-    clear
+    printf '\033c'
         echo -e "$RAYA"
     echo -e "${BLANCO}${BOLD}   SOCKS PYTHON DIRECTO OS / 200 ESTABLISH ADM SJCC - 200 ESTABLISH  ${RESET}"
         echo -e "$RAYA"
@@ -2538,12 +2540,12 @@ nombre_udp_panel() {
     fi
 }
 
-MENU PRINCIPAL FINAL LIMPIO - DARKZSAID v1.0
+# MENU PRINCIPAL FINAL LIMPIO - DARKZSAID v1.0
 # =========================================================
 
 menu_principal() {
     while true; do
-        clear
+        printf '\033c'
 
         # Logo superior
         if [[ -f /etc/darkzsaid/panel_logo.conf ]]; then
@@ -2555,7 +2557,10 @@ menu_principal() {
         PANEL_AUTHOR="@DarkZsaid"
 
         echo -e "${CYAN}"
-        toilet -f big "$PANEL_LOGO_TEXT" 2>/dev/null | sed '/^[[:space:]]*$/d' || figlet "$PANEL_LOGO_TEXT" 2>/dev/null | sed '/^[[:space:]]*$/d' || echo "$PANEL_LOGO_TEXT"
+    echo -e "${CYAN}◇════════════════════════════════════════════◇${RESET}"
+    echo -e "${CYAN}◇${RESET}        ${BLANCO}${BOLD}⚡ DARKZSAID ⚡${RESET}        ${CYAN}◇${RESET}"
+    echo -e "${CYAN}◇${RESET}   ${AMARILLO}VPN / SSH / UDP / BOT PANEL${RESET}   ${CYAN}◇${RESET}"
+    echo -e "${CYAN}◇════════════════════════════════════════════◇${RESET}"
         echo -e "${RESET}"
 
 RAYA="${CYAN}◆════════════════════════════════════════════════◆${RESET}"
@@ -2573,7 +2578,9 @@ RAYA="${CYAN}◆═════════════════════�
         FECHA_INFO=$(date '+%d/%m/%Y-%H:%M')
         UPTIME_INFO=$(uptime -p | sed 's/up //')
 
+    DOMINIO_INFO=$(cat /etc/darkzsaid/domain.conf 2>/dev/null); [[ -z "$DOMINIO_INFO" ]] && DOMINIO_INFO="NO CONFIGURADO"
         echo -e "${CYAN} ◈${RESET} ${CYAN}SO:${RESET} ${BLANCO}${SO_INFO}${RESET} ${CYAN}◈${RESET} ${CYAN}IP:${RESET} ${CELESTE}${IP_INFO}${RESET}"
+    echo -e " ${CYAN}◇${RESET} ${AMARILLO}DOMINIO:${RESET} ${CELESTE}${DOMINIO_INFO}${RESET}"
         echo -e "${CYAN} ◈${RESET} ${CYAN}CPU:${RESET} ${BLANCO}${CPU_INFO} cores${RESET}      ${CYAN}◈${RESET} ${CYAN}Fecha:${RESET} ${CELESTE}${FECHA_INFO}${RESET}"
         printf "%b
 " "${CYAN} ◈ RAM:${RESET} ${BLANCO}${RAM_INFO}${RESET}"
@@ -2665,6 +2672,7 @@ RAYA="${CYAN}◆═════════════════════�
 " "${BLANCO}<3>${RESET} 🛠  ${BLANCO}HERRAMIENTAS${RESET}    ${BLANCO}<5>${RESET} ✚ ${BLANCO}PUERTOS${RESET}"
         printf "%b
 " "${BLANCO}<6>${RESET} ◆  ${BLANCO}EXTRAS BOT${RESET}    ${BLANCO}<7>${RESET} ⚙ ${BLANCO}LOGO SUPERIOR${RESET}"
+    printf "%b\n" " ${BLANCO}<10>${RESET} 🌐 ${AZUL}DOMINIO${RESET}"
         printf "%b
 " "${CYAN} ◈ Version: ${CYAN}${PANEL_VERSION}${RESET} ${CYAN}◈${RESET}"
         echo -e "$RAYA"
@@ -2747,6 +2755,7 @@ RAYA="${CYAN}◆═════════════════════�
                 fi
             ;;
 
+        10) bash /opt/darkzsaid/menus/dominio_menu.sh ;;
             9|09)
                 bash /opt/darkzsaid/menus/uninstall_darkzsaid.sh 2>/dev/null || {
                     echo "Desinstalador no encontrado."
@@ -2759,7 +2768,7 @@ RAYA="${CYAN}◆═════════════════════�
             ;;
 
             0|00)
-                clear
+                printf '\033c'
                 exit 0
             ;;
 
