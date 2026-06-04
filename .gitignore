@@ -1,23 +1,35 @@
-# Python cache
-__pycache__/
-*.pyc
-
-# Backups temporales
+# Backups
 *.bak
 *.bak_*
-*.malo_*
-backups_bot/
-backups_solo_3/
+backups_*/
+backup_*/
 *.tar.gz
-
-# Configs sensibles
-/etc/darkzsaid/bot/bot.conf
-bot.conf
-*.conf.secret
+*.zip
 
 # Logs
 *.log
+logs/
+*.out
 
-# Runtime data sensible
-data/admins.db
-data/usuarios.db
+# Runtime
+*.pid
+*.sock
+__pycache__/
+*.pyc
+
+# Archivos sensibles
+token.txt
+bot_token.txt
+.env
+config.env
+config.json
+authorized_keys
+id_rsa
+id_rsa.pub
+*.key
+*.pem
+
+# Temporales
+tmp/
+temp/
+.cache/

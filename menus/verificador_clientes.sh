@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 source /opt/darkzsaid/lib/estilo_original.sh
 
 REGISTER_LOG="/etc/adm-lite/registerBOT.log"

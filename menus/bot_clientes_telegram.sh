@@ -1,4 +1,9 @@
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 estado_botssh_real() {
     if systemctl is-active --quiet darkzsaid-bot.service; then
         echo "ON"
@@ -36,7 +41,7 @@ status_whatsapp() {
 
 
 toggle_botssh() {
-    clear
+    limpiar_pantalla
     print_center -azu "ACTIVAR / DETENER BOT TELEGRAM"
 
     if systemctl is-active --quiet darkzsaid-bot.service; then

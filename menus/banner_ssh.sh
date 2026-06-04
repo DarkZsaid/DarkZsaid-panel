@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 source /opt/darkzsaid/lib/estilo_original.sh
 shopt -s extglob
 
@@ -50,7 +55,7 @@ asegurar_banner_ssh() {
 }
 
 banner_personalizado() {
-    clear
+    limpiar_pantalla
     local="/etc/bannerssh"
 
     msg -bar3
@@ -163,7 +168,7 @@ agregar_mensaje_banner() {
 }
 
 eliminar_banner() {
-    clear
+    limpiar_pantalla
     msg -bar3
     echo -e "\033[1;37m Verificando existencia de BANNER\033[0m"
     msg -bar3
@@ -188,7 +193,7 @@ eliminar_banner() {
 }
 
 checkuser_banner() {
-    clear
+    limpiar_pantalla
     msg -bar3
     print_center -verm2 " BANNER + CHECKUSER CUSTOM"
     msg -bar3
@@ -219,7 +224,7 @@ while true; do
     case "$selection" in
         0) break ;;
         1)
-            clear
+            limpiar_pantalla
             echo -e " Al escojer que coloques tu Banner creado fuera del Script, ADM no se "
             echo -e "    Responsabiliza por el Fallo de ciertos recursos del SISTEMA"
             echo -e "RECUERDA QUE EL SCRIPT ESTA REALIZADO PARA FUNCIONAR CON SUS FUNCIONES"
@@ -229,7 +234,7 @@ while true; do
             [[ "$sshsn" = @(s|S|y|Y) ]] && banner_personalizado
             ;;
         2)
-            clear
+            limpiar_pantalla
             echo -e "${cor[3]} Buena ELECCION, Tienes un 99% mas Garantia"
             echo -e "${cor[3]} Esta SEGURO:"
             read -p " [S/N]: " -e -i s sshsn

@@ -1,4 +1,9 @@
 #!/bin/bash
+
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
 source /opt/darkzsaid/menus/ui_instalacion.sh 2>/dev/null || true
 
 [[ -f /opt/darkzsaid/lib/ui.sh ]] && source /opt/darkzsaid/lib/ui.sh
@@ -19,7 +24,7 @@ pausa_udp() {
 }
 
 titulo_udp_hysteria() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}╔════════════════════════════════════════════╗${RESET}"
     echo -e "${CYAN}║${RESET}       ${BLANCO}⚡ DARKZSAID UDP HYSTERIA ⚡${RESET}      ${CYAN}║${RESET}"
     echo -e "${CYAN}╚════════════════════════════════════════════╝${RESET}"

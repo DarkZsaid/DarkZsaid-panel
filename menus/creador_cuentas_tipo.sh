@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 ROJO="\e[31m"
 VERDE="\e[32m"
 AMARILLO="\e[33m"
@@ -21,7 +26,7 @@ pausa() {
 }
 
 titulo() {
-    clear
+    limpiar_pantalla
     echo -e "${AZUL}=====>>> 🐉 DarkZsaid 💥 Plus 🐉 <<<=====${RESET}"
     echo -e "${AMARILLO}────────────────────────────────────────────${RESET}"
     echo ""
@@ -315,7 +320,7 @@ modificar_token_pass() {
 }
 
 listar_usuarios() {
-    clear
+    limpiar_pantalla
 
     HOY_SEC=$(date +%s)
 

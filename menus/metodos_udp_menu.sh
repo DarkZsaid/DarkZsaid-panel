@@ -1,8 +1,13 @@
 #!/bin/bash
+
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
 [[ -f /opt/darkzsaid/lib/ui.sh ]] && source /opt/darkzsaid/lib/ui.sh
 
 titulo_udp() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}╔════════════════════════════════════════════╗${RESET}"
     echo -e "${CYAN}║${RESET}        ${BLANCO}⚡ DARKZSAID CONTROL PANEL ⚡${RESET}     ${CYAN}║${RESET}"
     echo -e "${CYAN}╚════════════════════════════════════════════╝${RESET}"
@@ -27,7 +32,7 @@ abrir_udp_hysteria() {
     elif declare -f menu_udp_hysteria >/dev/null 2>&1; then
         menu_udp_hysteria
     else
-        clear
+        limpiar_pantalla
         echo -e "${AMARILLO}UDP HYSTERIA todavía usa la opción antigua del panel.${RESET}"
         echo "No se encontró /opt/darkzsaid/menus/udp_hysteria_menu.sh"
         echo ""
@@ -43,7 +48,7 @@ abrir_udp_custom() {
     elif declare -f menu_udp_custom >/dev/null 2>&1; then
         menu_udp_custom
     else
-        clear
+        limpiar_pantalla
         echo -e "${AMARILLO}UDP CUSTOM todavía usa la opción antigua del panel.${RESET}"
         echo "No se encontró /opt/darkzsaid/menus/udp_custom_menu.sh"
         echo ""

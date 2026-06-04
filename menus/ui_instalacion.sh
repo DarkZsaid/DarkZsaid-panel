@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 ROJO="\e[31m"
 VERDE="\e[32m"
 AMARILLO="\e[33m"
@@ -9,7 +14,7 @@ CYAN="\e[36m"
 BLANCO="\e[97m"
 RESET="\e[0m"
 
-clear
+limpiar_pantalla
 barra() {
     echo -e "${CYAN}╔══════════════════════════════════════════════╗${RESET}"
 }
@@ -19,7 +24,7 @@ barra_abajo() {
 }
 
 titulo_instalacion() {
-    clear
+    limpiar_pantalla
     barra
     printf "${BLANCO}║        ⚡ %-31s ║${RESET}\n" "$1"
     barra_abajo

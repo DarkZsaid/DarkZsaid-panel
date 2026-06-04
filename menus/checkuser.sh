@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 source /opt/darkzsaid/lib/estilo_original.sh
 
 CONF="/etc/darkzsaid/checkuser/checkuser.conf"
@@ -79,7 +84,7 @@ puerto_libre_checkuser() {
 }
 
 start_checkUser() {
-    clear
+    limpiar_pantalla
     header
     msg -bar3
     print_center -azu "VERIFICACION DE USUARIOS ONLINE"
@@ -121,7 +126,7 @@ start_checkUser() {
 
     sleep 2
 
-    clear
+    limpiar_pantalla
     header
     msg -bar3
     print_center -azu "VERIFICACION DE USUARIOS ONLINE"
@@ -149,7 +154,7 @@ stop_checkUser() {
     pkill -f "/bin/ejecutar/CheckUser" 2>/dev/null
     pkill -f "checkuser_server.py" 2>/dev/null
 
-    clear
+    limpiar_pantalla
     header
     msg -bar3
     print_center -azu "VERIFICACION DE USUARIOS ONLINE"
@@ -162,7 +167,7 @@ stop_checkUser() {
 modificar_puerto() {
     load_conf
 
-    clear
+    limpiar_pantalla
     header
     msg -bar3
     print_center -azu "MODIFICAR PUERTO CheckUser"
@@ -192,7 +197,7 @@ modificar_puerto() {
 modificar_formato() {
     load_conf
 
-    clear
+    limpiar_pantalla
     header
     msg -bar3
     print_center -azu "MODIFICAR FORMATO CheckUser"
@@ -218,7 +223,7 @@ modificar_formato() {
 }
 
 toggle_user_activos_app() {
-    clear
+    limpiar_pantalla
     header
     msg -bar3
     print_center -azu "USER ACTIVOS EN APP"
@@ -242,7 +247,7 @@ menu_chekuser() {
         load_conf
         STATUS="$(status_txt)"
 
-        clear
+        limpiar_pantalla
         header
         msg -bar3
         print_center -azu "VERIFICACION DE USUARIOS ONLINE"

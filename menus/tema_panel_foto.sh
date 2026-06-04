@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 VERSION_SCRIPT="v1.0"
 
 ROJO="\e[31m"
@@ -56,7 +61,7 @@ titulo_superior_panel() {
     FECHA_VPS="$(date '+%d/%m/%Y-%H:%M')"
     UPTIME_VPS="$(uptime -p 2>/dev/null | sed 's/up //')"
 
-    clear
+    limpiar_pantalla
     logo_panel
     linea_panel
     echo -e "${BLANCO} ⚡ Gestor VPN/SSH by ${CYAN}${PANEL_AUTHOR}${BLANCO}  ◆  ${AMARILLO}${PANEL_VERSION}${RESET}"

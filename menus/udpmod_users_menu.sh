@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 CONFIG="/etc/udpmod/config.json"
 DB="/opt/darkzsaid/data/usuarios_udpmod.db"
 
@@ -25,7 +30,7 @@ linea() {
 }
 
 titulo() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}╔════════════════════════════════════════════╗${RESET}"
     printf "${CYAN}║${RESET} ${BLANCO}${BOLD}%-42s${RESET} ${CYAN}║${RESET}\n" "$1"
     echo -e "${CYAN}╚════════════════════════════════════════════╝${RESET}"
@@ -108,7 +113,7 @@ mostrar_tarjeta_usuario() {
     [[ -z "$UP" ]] && UP="17"
     [[ -z "$DOWN" ]] && DOWN="15"
 
-    clear
+    limpiar_pantalla
     echo -e "${VERDE}╔════════════════════════════════════════════╗${RESET}"
     echo -e "${VERDE}║${RESET} ${BLANCO}${BOLD}      USUARIO UDP-HYSTERIA CREADO       ${RESET}${VERDE}║${RESET}"
     echo -e "${VERDE}╚════════════════════════════════════════════╝${RESET}"
@@ -533,7 +538,7 @@ cambiar_password_token_global() {
 }
 
 while true; do
-    clear
+    limpiar_pantalla
 
     TOTAL_UDP=$(grep -c "|" "$DB" 2>/dev/null || echo 0)
 

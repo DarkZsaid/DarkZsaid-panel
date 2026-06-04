@@ -1,4 +1,9 @@
 #!/bin/bash
+
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
 source /opt/darkzsaid/menus/ui_instalacion.sh 2>/dev/null || true
 [[ -f /opt/darkzsaid/lib/ui.sh ]] && source /opt/darkzsaid/lib/ui.sh
 
@@ -8,7 +13,7 @@ ZIVPN_BIN="/usr/local/bin/zivpn"
 ZIVPN_PORT="5667"
 
 titulo_zivpn() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}╔════════════════════════════════════════════╗${RESET}"
     echo -e "${CYAN}║${RESET}              ${BLANCO}⚡ ZIVPN ⚡${RESET}                 ${CYAN}║${RESET}"
     echo -e "${CYAN}╚════════════════════════════════════════════╝${RESET}"

@@ -1,4 +1,9 @@
 #!/bin/bash
+
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
 source /opt/darkzsaid/menus/ui_instalacion.sh 2>/dev/null || true
 
 source /opt/darkzsaid/lib/install_clean.sh 2>/dev/null || true
@@ -17,7 +22,7 @@ pausa() {
 }
 
 titulo_dropbear() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}╔════════════════════════════════════════════════════╗${RESET}"
     echo -e "${CYAN}║${RESET} ${BLANCO}${BOLD}        DROPBEAR SSH${RESET}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════╝${RESET}"

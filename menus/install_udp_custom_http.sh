@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 source /opt/darkzsaid/menus/ui_instalacion.sh 2>/dev/null || true
 
 titulo_instalacion "UDP CUSTOM HTTP"

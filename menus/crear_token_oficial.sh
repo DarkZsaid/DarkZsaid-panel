@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 ROJO="\e[31m"
 VERDE="\e[32m"
 AMARILLO="\e[33m"
@@ -21,7 +26,7 @@ echo 'TOKEN_PASSWORD="steven2002"' > "$DATA_DIR/token_password.conf"
 echo 'steven2002' > /opt/darkzsaid/users/token_password.conf
 chmod 600 "$DATA_DIR/token_password.conf" /opt/darkzsaid/users/token_password.conf 2>/dev/null || true
 
-clear
+limpiar_pantalla
 echo -e "${CYAN}╔════════════════════════════════════════════════════╗${RESET}"
 echo -e "${CYAN}║${RESET} ${BLANCO}${BOLD}        CREAR CUENTA TOKEN${RESET}"
 echo -e "${CYAN}╚════════════════════════════════════════════════════╝${RESET}"

@@ -1,6 +1,11 @@
 #!/bin/bash
 
-clear
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
+limpiar_pantalla
 echo "======================================"
 echo "        DESINSTALAR DARKZSAID"
 echo "======================================"

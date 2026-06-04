@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 open_ssl_443_firewall() {
   echo -e "${CYAN:-}Abriendo puerto SSL/TLS 443...${RESET:-}"
 
@@ -41,7 +46,7 @@ pausa() {
 }
 
 titulo_stunnel() {
-  clear
+  limpiar_pantalla
   echo -e "${CYAN}╔════════════════════════════════════════════════════╗${RESET}"
   echo -e "${CYAN}║${RESET} ${BLANCO}${BOLD}          DARKZSAID STUNNEL SSL 443          ${RESET}${CYAN}║${RESET}"
   echo -e "${CYAN}╚════════════════════════════════════════════════════╝${RESET}"

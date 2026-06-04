@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 source /opt/darkzsaid/menus/ui_instalacion.sh 2>/dev/null || true
 
 VERDE="\e[32m"
@@ -65,7 +70,7 @@ detener_udp_custom() {
 }
 
 while true; do
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}╔══════════════════════════════════════════════╗${RESET}"
     echo -e "${BLANCO}║          ⚡ UDP CUSTOM HTTP CUSTOM ⚡        ║${RESET}"
     echo -e "${CYAN}╚══════════════════════════════════════════════╝${RESET}"

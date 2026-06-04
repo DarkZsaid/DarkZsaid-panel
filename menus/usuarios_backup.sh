@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 source /opt/darkzsaid/lib/estilo_original.sh
 source /opt/darkzsaid/lib/usuarios_core.sh 2>/dev/null
 
@@ -57,7 +62,7 @@ backup_de_usuarios() {
 
     IP="$(get_ip_backup)"
 
-    clear
+    limpiar_pantalla
     msg -bar3
     print_center -verd '  \e[97m\033[1;41m NOMBRE DE FICHERO WEB FILE\033[0m'
     msg -bar3
@@ -80,7 +85,7 @@ backup_de_usuarios() {
 
     [[ -e "$bc" ]] && rm -f "$bc"
 
-    clear
+    limpiar_pantalla
     echo -e "\033[1;37mHaciendo Backup de Usuarios...\033[0m"
     msg -bar3
 
@@ -223,7 +228,7 @@ crear_usuario_restore() {
 restaurar_usuarios_online() {
     cd "$HOME" || return
 
-    clear
+    limpiar_pantalla
     msg -bar3
     print_center -verd '  \e[97m\033[1;41m LINK DE FICHERO WEB FILE\033[0m'
     msg -bar3
@@ -284,7 +289,7 @@ restaurar_usuarios_local() {
 }
 
 while true; do
-    clear
+    limpiar_pantalla
     header
     print_center -verm2 'ADVERTENCIA!!!\n RECUERDA QUE EL BACKUP DEBE SER ALMACENADO \n FUERA DEL VPS PARA EVITAR PERDIDAS \n UNA VEZ RESTAURADO EL SERVIDOR RECUPERA EL \n FICHERO, SEA ONLINE O LOCAL !'
     msg -bar3

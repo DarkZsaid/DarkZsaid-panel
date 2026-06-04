@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 ROJO="\e[31m"
 VERDE="\e[32m"
 AMARILLO="\e[33m"
@@ -27,7 +32,7 @@ estado_puerto() {
 }
 
 titulo_protocolos() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}◆══════════════════════════════════════════════◆${RESET}"
     echo -e "${BLANCO}        ⚡ INSTALADORES & PROTOCOLOS ⚡${RESET}"
     echo -e "${CYAN}◆══════════════════════════════════════════════◆${RESET}"

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 # DarkZsaid UDPMod Redirect
 # Redirige UDP 10000-65000 hacia el puerto real UDPMod 36712
 

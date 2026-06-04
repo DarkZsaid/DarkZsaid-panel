@@ -1,6 +1,11 @@
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 borrar_todos_usuarios_seguro() {
-    clear
+    limpiar_pantalla
     echo -e "${ROJO}${BOLD}BORRAR TODOS LOS USUARIOS REGISTRADOS${RESET}"
     echo -e "${AMARILLO}────────────────────────────────────────────${RESET}"
     echo ""
@@ -84,7 +89,7 @@ borrar_todos_usuarios_seguro() {
 
 checkuser_protocolo_menu() {
     while true; do
-        clear
+        limpiar_pantalla
         echo -e "${CYAN}╔════════════════════════════════════════════════════╗${RESET}"
         echo -e "${CYAN}║${RESET} ${BLANCO}${BOLD}           CHECK USER API / PROTOCOLO          ${RESET}${CYAN}║${RESET}"
         echo -e "${CYAN}╚════════════════════════════════════════════════════╝${RESET}"
@@ -124,7 +129,7 @@ checkuser_protocolo_menu() {
 
         case "$op_chk" in
             1|01)
-                clear
+                limpiar_pantalla
                 echo -e "${CYAN}╔════════════════════════════════════════════════════╗${RESET}"
                 echo -e "${CYAN}║${RESET} ${BLANCO}${BOLD}        ACTIVAR CHECK USER API DARKZSAID       ${RESET}${CYAN}║${RESET}"
                 echo -e "${CYAN}╚════════════════════════════════════════════════════╝${RESET}"
@@ -359,8 +364,10 @@ SERVICE
                 ;;
 
             0|00)
-                return
-                ;;
+                
+        printf "c"
+        exit 0
+        ;;
 
             *)
                 echo "Opción inválida."
@@ -384,7 +391,7 @@ dz_borrar_todos_sin_preguntar_registrados_final() {
 
 
 modificar_contrasena_token() {
-    clear
+    limpiar_pantalla
     echo "════════════════════════════════════════"
     echo "      MODIFICAR CONTRASEÑA TOKEN"
     echo "════════════════════════════════════════"
@@ -531,7 +538,7 @@ opcion_mala() {
 
 
 titulo_users() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}╔════════════════════════════════════════════╗${RESET}"
     echo -e "${CYAN}║${RESET}        ${BLANCO}⚡ DARKZSAID CONTROL PANEL ⚡${RESET}     ${CYAN}║${RESET}"
     echo -e "${CYAN}╚════════════════════════════════════════════╝${RESET}"
@@ -669,7 +676,7 @@ menu_agregar_usuario() {
 
 
 listar_usuarios() {
-    clear
+    limpiar_pantalla
 
     echo -e "${CYAN}======>>> 🐲 DarkZsaid 💥 Plus 🐲 <<<======${RESET}"
     echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
@@ -774,7 +781,7 @@ eliminar_un_usuario() {
 }
 eliminar_caducados() {
     while true; do
-        clear
+        limpiar_pantalla
         titulo_users "ELIMINAR USUARIOS"
         echo -e "${ROJO}[01]${RESET} ${CYAN}➜${RESET} ${BLANCO}1 USER${RESET}"
         echo -e "${ROJO}[02]${RESET} ${CYAN}➜${RESET} ${BLANCO}TODOS ITERATIVO 1x1${RESET} ${VERDE}[RECOMENDADO]${RESET}"
@@ -1110,7 +1117,7 @@ anadir_dias_cliente_final() {
     guardar_usuario_final "$u|$pass|$tipo|$limite|$nuevos_dias|$nueva_fecha"
     actualizar_linux_expira_final "$usuario" "$nueva_fecha"
 
-    clear
+    limpiar_pantalla
     echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
     echo -e "              ${VERDE}ACTUALIZACION EXITOSA !!!${RESET}"
     echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
@@ -1557,7 +1564,7 @@ actualizar_linux_clave_final() {
 # ==========================================================
 
 usuarios_conectados() {
-    clear
+    limpiar_pantalla
 
     echo -e "${CYAN}======>>> 🐲 DarkZsaid 💥 Plus 🐲 <<<======${RESET}"
     echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"

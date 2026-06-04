@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 CYAN="\e[36m"
 VERDE="\e[32m"
 ROJO="\e[31m"
@@ -10,7 +15,7 @@ RESET="\e[0m"
 CONFIG="/etc/darkzsaid/panel_logo.conf"
 mkdir -p /etc/darkzsaid
 
-clear
+limpiar_pantalla
 echo -e "${CYAN}◆══════════════════════════════════════════════◆${RESET}"
 echo -e "${BLANCO}        ⚡ CAMBIAR LOGO SUPERIOR ⚡${RESET}"
 echo -e "${CYAN}◆══════════════════════════════════════════════◆${RESET}"

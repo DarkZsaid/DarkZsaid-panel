@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 # ELIMINADO AUTOINICIADOR: rm -f /opt/darkzsaid/data/autoiniciador.conf 2>/dev/null || true
 # ELIMINADO AUTOINICIADOR: rm -f /usr/local/bin/autoiniciador-on 2>/dev/null || true
 # ELIMINADO AUTOINICIADOR: rm -f /usr/local/bin/autoiniciador-off 2>/dev/null || true
@@ -19,7 +24,7 @@ BLANCO="\e[97m"
 RESET="\e[0m"
 BOLD="\e[1m"
 
-clear
+limpiar_pantalla
 
 IP_PUBLICA=$(curl -4 -s https://api.ipify.org 2>/dev/null)
 IP_LOCAL=$(hostname -I 2>/dev/null | awk '{print $1}')

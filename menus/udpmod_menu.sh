@@ -1,4 +1,9 @@
 #!/bin/bash
+
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
 [[ -f /opt/darkzsaid/lib/puertas_reales.sh ]] && source /opt/darkzsaid/lib/puertas_reales.sh
 
 ROJO="\e[31m"; VERDE="\e[32m"; AMARILLO="\e[33m"; AZUL="\e[34m"
@@ -6,7 +11,7 @@ CYAN="\e[36m"; BLANCO="\e[97m"; RESET="\e[0m"; BOLD="\e[1m"
 IP="216.238.113.15"
 
 titulo() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}╔════════════════════════════════════════════════════╗${RESET}"
     echo -e "${CYAN}║${RESET}        ${BLANCO}${BOLD}⚡ DARKZSAID CONTROL ⚡${RESET}             ${CYAN}║${RESET}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════╝${RESET}"

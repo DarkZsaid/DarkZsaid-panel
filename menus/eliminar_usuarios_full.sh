@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 ROJO="\e[31m"
 VERDE="\e[32m"
 AMARILLO="\e[33m"
@@ -128,7 +133,7 @@ PY
 }
 
 opcion_1_user() {
-    clear
+    limpiar_pantalla
     echo -e "${AMARILLO}USUARIOS REGISTRADOS${RESET}"
     echo -e "${AMARILLO}────────────────────────────────────────────${RESET}"
 
@@ -183,7 +188,7 @@ opcion_1_user() {
 }
 
 opcion_borrar_todo() {
-    clear
+    limpiar_pantalla
     echo -e "${ROJO}${BOLD}BORRAR TODOS LOS USUARIOS REGISTRADOS${RESET}"
     echo -e "${AMARILLO}────────────────────────────────────────────${RESET}"
     echo ""

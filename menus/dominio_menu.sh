@@ -1,9 +1,14 @@
 #!/bin/bash
+
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
 CONF="/etc/darkzsaid/domain.conf"
 touch "$CONF"
 
 while true; do
-clear
+limpiar_pantalla
 DOMINIO_ACTUAL=$(cat "$CONF" 2>/dev/null)
 
 echo -e "\033[1;36m════════════════════════════════════\033[0m"
@@ -24,7 +29,12 @@ read -rp "Opción: " op
 case "$op" in
   1)
     read -rp "Escribe tu dominio: " NUEVO_DOM
-    [[ -n "$NUEVO_DOM" ]] && echo "$NUEVO_DOM" > "$CONF" && echo "Dominio guardado: $NUEVO_DOM"
+    if [[ -n "$NUEVO_DOM" ]]; then
+    echo "$NUEVO_DOM" > "$CONF"
+    echo "$NUEVO_DOM" > /opt/darkzsaid/dominio.txt
+    echo "$NUEVO_DOM" > /opt/darkzsaid/domain.txt
+    echo "Dominio guardado: $NUEVO_DOM"
+fi
     read -rp "ENTER para volver..."
     ;;
   2)

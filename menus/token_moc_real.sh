@@ -1,6 +1,11 @@
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 modificar_contrasena_token() {
-    clear
+    limpiar_pantalla
     echo "════════════════════════════════════════"
     echo "      MODIFICAR CONTRASEÑA TOKEN"
     echo "════════════════════════════════════════"
@@ -71,7 +76,7 @@ pausa() {
 }
 
 titulo() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}═════>>> 🐉 DarkZsaid ✸ Plus 🐉 <<<═════${RESET}"
     echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
     echo -e "${BLANCO}${BOLD}          $1${RESET}"

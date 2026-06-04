@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 ROJO="\e[31m"
 VERDE="\e[32m"
 AMARILLO="\e[33m"
@@ -12,7 +17,7 @@ BOLD="\e[1m"
 USERDIR="/etc/adm-lite/userDIR"
 DB="/opt/darkzsaid/data/usuarios_ssh.db"
 
-clear
+limpiar_pantalla
 echo -e "======>>> 🐉 ${CYAN}DarkZsaid${RESET} 💥 ${ROJO}Plus${RESET} 🐉 <<<======"
 echo ""
 echo -e "${AMARILLO}🔐 ADMINISTRADOR DE USUARIOS SSH|SSL|DROPBEAR 🔐${RESET}"

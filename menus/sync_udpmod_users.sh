@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 # Sincroniza usuarios SSH/TOKEN con UDP-Hysteria
 # y mantiene OBFS permanente en DarkZsaid.
 

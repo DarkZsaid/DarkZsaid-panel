@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 CONFIG="/etc/udpmod/config.json"
 DATA_DIR="/opt/darkzsaid/data"
 SSH_DB="$DATA_DIR/usuarios_ssh.db"

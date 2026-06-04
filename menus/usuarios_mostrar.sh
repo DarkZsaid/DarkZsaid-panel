@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 [[ -f /opt/darkzsaid/lib/estilo_original.sh ]] && source /opt/darkzsaid/lib/estilo_original.sh
 
 USERDIR="/etc/adm-lite/userDIR"
@@ -9,7 +14,7 @@ bar() {
 }
 
 titulo() {
-    clear
+    limpiar_pantalla
     if declare -F header >/dev/null 2>&1; then
         header
     fi

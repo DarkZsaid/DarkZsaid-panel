@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 ROJO="\e[31m"
 VERDE="\e[32m"
 AMARILLO="\e[33m"
@@ -19,7 +24,7 @@ pausa() {
 }
 
 titulo() {
-    clear
+    limpiar_pantalla
     echo -e "${CYAN}════════════════════════════════════════════${RESET}"
     echo -e "${BLANCO}${BOLD}        $1${RESET}"
     echo -e "${CYAN}════════════════════════════════════════════${RESET}"

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+limpiar_pantalla() {
+    printf '\033[H\033[2J\033[3J'
+}
+
+
 ROJO="\e[31m"
 VERDE="\e[32m"
 AMARILLO="\e[33m"
@@ -17,7 +22,7 @@ pausa() {
 }
 
 titulo() {
-    clear
+    limpiar_pantalla
     echo -e "${ROJO}════════════════════════════════════════════${RESET}"
     echo -e "${BLANCO}${BOLD}        SOCKS PYTHON DIRECTO WS             ${RESET}"
     echo -e "${ROJO}════════════════════════════════════════════${RESET}"
