@@ -33,3 +33,12 @@ id_rsa.pub
 tmp/
 temp/
 .cache/
+
+# Backups internos del panel
+menus_rotos_*/
+backups_clear_*/
+backup_read_opcion_*/
+backup_pantalla_*/
+backup_motd_*/
+*.bak_*
+*.bak
