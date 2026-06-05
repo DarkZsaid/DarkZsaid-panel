@@ -187,9 +187,14 @@ case "$op" in
             ;;
 99) reboot ;;
             0) clear; exit ;;
-            11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            11|011|011)
+            if [[ -f /opt/darkzsaid/core/github_loader.sh ]]; then
+                source /opt/darkzsaid/core/github_loader.sh
+                run_github_panel "menus/ssh_ws_puro_menu.sh"
+            else
+                bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+            fi
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
