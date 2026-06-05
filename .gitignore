@@ -72,3 +72,16 @@ backup_*/
 *.bak_*
 *.log
 *.tar.gz
+
+# No subir archivos temporales
+cache_github/
+cache_github/**
+backup_runtime/
+backup_runtime/**
+menus_rotos_*/
+backups_*/
+backup_*/
+*.bak
+*.bak_*
+*.log
+*.tar.gz
