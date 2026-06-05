@@ -34,3 +34,7 @@ id_rsa
 id_rsa.pub
 *.key
 *.pem
+
+# Runtime backups - no subir a GitHub
+backup_runtime/
+backup_runtime/**
