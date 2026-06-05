@@ -2747,11 +2747,26 @@ RAYA="${CYAN}◆═════════════════════�
         }
 
         if puerto_activo 22; then
+            # DARKZSAID_DROPBEAR_TOP_START
+            DROPBEAR_PORTS=""
+            for _dbp in 44 109 143; do
+                if ss -tulnp 2>/dev/null | grep -q ":${_dbp} " && ss -tulnp 2>/dev/null | grep ":${_dbp} " | grep -qi "dropbear"; then
+                    DROPBEAR_PORTS="${DROPBEAR_PORTS:+$DROPBEAR_PORTS,}${_dbp}"
+                fi
+            done
+            if [[ -n "$DROPBEAR_PORTS" ]]; then
+                DROPBEAR_TOP="${DROPBEAR_PORTS} ${VERDE}ON${RESET}"
+            else
+                DROPBEAR_TOP="${ROJO}OFF${RESET}"
+            fi
+            # DARKZSAID_DROPBEAR_TOP_END
             PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SSH:22${RESET} ${CYAN}◆ ON${RESET}")
+            PUERTOS_LINEAS+=("${CYAN} ◇${RESET} ${BLANCO}DROP:${RESET} ${DROPBEAR_TOP}")
         fi
 
         if puerto_activo 53; then
             PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}DNS:53${RESET} ${CYAN}◆ ON${RESET}")
+            PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_AFTER_DNS_FOR_WS
         fi
 
         if puerto_activo 80; then
@@ -2760,7 +2775,7 @@ RAYA="${CYAN}◆═════════════════════�
             for _ws_p in 80 90 8080 8082 8084 8086; do
                 ss -tulnp 2>/dev/null | grep -q ":${_ws_p} " && WS_PURO_PORTS="${WS_PURO_PORTS:+$WS_PURO_PORTS,}${_ws_p}"
             done
-            [ -n "$WS_PURO_PORTS" ] && WS_PURO_LABEL="SOCKS:${WS_PURO_PORTS}" || WS_PURO_LABEL="SOCKS:OFF"
+            [ -n "$WS_PURO_PORTS" ] && WS_PURO_LABEL="WS:${WS_PURO_PORTS}" || WS_PURO_LABEL="WS:OFF"
             # DARKZSAID_WS_PORTS_TOP_END
             PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}${WS_PURO_LABEL}${RESET} ${CYAN}◆ ON${RESET}")
         fi
