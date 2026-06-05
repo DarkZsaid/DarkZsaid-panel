@@ -42,3 +42,7 @@ backup_runtime/**
 # Cache temporal del loader GitHub
 cache_github/
 cache_github/**
+
+# Cache temporal del loader GitHub
+cache_github/
+cache_github/**
