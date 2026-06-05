@@ -1,5 +1,35 @@
 #!/bin/bash
 
+# DARKZSAID_MODULAR_LOADER_START
+dz_mod() {
+    local rel="$1"
+    local fallback_func="$2"
+
+    if [[ -f /opt/darkzsaid/core/github_loader.sh ]]; then
+        source /opt/darkzsaid/core/github_loader.sh
+        run_github_panel "$rel" && return 0
+    fi
+
+    if [[ -f "/opt/darkzsaid/$rel" ]]; then
+        bash "/opt/darkzsaid/$rel"
+        return $?
+    fi
+
+    if [[ -n "$fallback_func" ]] && declare -F "$fallback_func" >/dev/null 2>&1; then
+        "$fallback_func"
+        return $?
+    fi
+
+    echo
+    echo "No se pudo cargar el módulo:"
+    echo "$rel"
+    echo
+    read -rp "Presione ENTER para continuar..."
+    return 1
+}
+# DARKZSAID_MODULAR_LOADER_END
+
+
 ROJO="\e[1;31m"
 VERDE="\e[1;97m"
 AMARILLO="\e[1;95m"
@@ -149,41 +179,41 @@ echo -e "${RESET}"
     # DARKZSAID_OP11_WS_PURO_START
     op="${op//[[:space:]]/}"
     if [[ "$op" == "11" || "$op" == "011" ]]; then
-      bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+      dz_mod "menus/ssh_ws_puro_menu.sh" ""
       continue
     fi
     # DARKZSAID_OP11_WS_PURO_END
 
         
 case "$op" in
-            1) bash /opt/darkzsaid/menus/users_menu.sh ;;
-            2) bash /opt/darkzsaid/menus/metodos_udp_menu.sh ;;
+            1) dz_mod "menus/users_menu.sh" "" ;;
+            2) dz_mod "menus/metodos_udp_menu.sh" "" ;;
             3) menu_herramientas ;;
         4|04)
             echo "Opción eliminada."
             sleep 1
             ;;
         5|05)
-            bash /opt/darkzsaid/socks_ws_menu.sh
+            dz_mod "socks_ws_menu.sh" ""
             ;;
             6|06)
                 if [[ -x /opt/darkzsaid/menus/extras_telegram_checkuser.sh ]]; then
-                    bash /opt/darkzsaid/menus/extras_telegram_checkuser.sh
+                    dz_mod "menus/extras_telegram_checkuser.sh" ""
                 else
                     echo "No se encontró /opt/darkzsaid/menus/extras_telegram_checkuser.sh"
                     read -rp "Presiona ENTER para volver..."
                 fi
                 ;;
-        7|07) bash /opt/darkzsaid/menus/configurar_nombre_panel.sh ;;
+        7|07) dz_mod "menus/configurar_nombre_panel.sh" "" ;;
 
 
 
         9|09)
-                bash /opt/darkzsaid/menus/uninstall_darkzsaid.sh
+                dz_mod "menus/uninstall_darkzsaid.sh" ""
                 exit 0
                 ;;
         10)
-            bash /opt/darkzsaid/menus/dominio_menu.sh
+            dz_mod "menus/dominio_menu.sh" ""
             ;;
 99) reboot ;;
             0) clear; exit ;;
@@ -192,7 +222,7 @@ case "$op" in
                 source /opt/darkzsaid/core/github_loader.sh
                 run_github_panel "menus/ssh_ws_puro_menu.sh"
             else
-                bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+                dz_mod "menus/ssh_ws_puro_menu.sh" ""
             fi
             ;;
             *) echo "Opción inválida"; sleep 1 ;;
@@ -270,7 +300,7 @@ menu_usuarios() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -308,12 +338,12 @@ menu_usuarios() {
                 pausa
                 ;;
             9|09)
-                bash /opt/darkzsaid/menus/udpmod_users_menu.sh
+                dz_mod "menus/udpmod_users_menu.sh" ""
                 ;;
             0) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -338,7 +368,7 @@ menu_instaladores() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -357,12 +387,12 @@ menu_instaladores() {
             8|08) instalar_badvpn ;;
             9|09) instalar_3xui ;;
             9|09)
-            bash /opt/darkzsaid/menus/udpmod_users_menu.sh
+            dz_mod "menus/udpmod_users_menu.sh" ""
             ;;
         0|00) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -449,7 +479,7 @@ menu_udp_custom_seguro() {
     titulo "UDP-CUSTOM"
 
     if [[ -f /opt/darkzsaid/menus/udp_custom_menu.sh ]]; then
-        bash /opt/darkzsaid/menus/udp_custom_menu.sh
+        dz_mod "menus/udp_custom_menu.sh" ""
         return
     fi
 
@@ -468,7 +498,7 @@ menu_udp_custom_seguro() {
 
 menu_zivpn_seguro() {
     if [[ -f /opt/darkzsaid/menus/zivpn_menu.sh ]]; then
-        bash /opt/darkzsaid/menus/zivpn_menu.sh
+        dz_mod "menus/zivpn_menu.sh" ""
     else
         echo "No se encontró /opt/darkzsaid/menus/zivpn_menu.sh"
         read -p "Presiona ENTER para volver..."
@@ -491,7 +521,7 @@ menu_appmods() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -512,12 +542,12 @@ menu_appmods() {
                 ;;
             5|05) cambiar_obfs_appmods ;;
             6|06)
-                bash /opt/darkzsaid/menus/udpmod_users_menu.sh
+                dz_mod "menus/udpmod_users_menu.sh" ""
                 ;;
             0) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -631,7 +661,7 @@ datos_appmods() {
 }
 
 menu_socks_python_ws() {
-    bash /opt/darkzsaid/socks_ws_menu.sh
+    dz_mod "socks_ws_menu.sh" ""
 }
 
 
@@ -1077,12 +1107,12 @@ instalar_base_socks_python_ws_silencioso() {
 }
 
 instalar_dropbear() {
-    bash /opt/darkzsaid/menus/dropbear_menu.sh
+    dz_mod "menus/dropbear_menu.sh" ""
 }
 
 
 instalar_stunnel() {
-    bash /opt/darkzsaid/menus/stunnel_menu.sh
+    dz_mod "menus/stunnel_menu.sh" ""
 }
 
 
@@ -1151,7 +1181,7 @@ menu_puertos() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -1182,8 +1212,8 @@ menu_puertos() {
             7) abrir_puertos_recomendados ;;
             0) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -1207,7 +1237,7 @@ menu_bot() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -1223,8 +1253,8 @@ menu_bot() {
             8) desactivar_bot_telegram ;;
             0) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -1566,7 +1596,7 @@ menu_herramientas() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -1579,8 +1609,8 @@ menu_herramientas() {
             5) ps aux --sort=-%mem | head -20; pausa ;;
             0) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -1620,7 +1650,7 @@ menu_ws_established() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -1633,8 +1663,8 @@ menu_ws_established() {
             5) systemctl restart ssh-ws; pausa ;;
             0) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -1935,7 +1965,7 @@ menu_ws_established() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -1948,8 +1978,8 @@ menu_ws_established() {
             5) systemctl restart ssh-ws; pausa ;;
             0) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -2445,7 +2475,7 @@ menu_ssh_ws_permanente() {
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -2459,8 +2489,8 @@ menu_ssh_ws_permanente() {
             6) journalctl -u ssh-ws -n 80 --no-pager -l; pausa ;;
             0) return ;;
             11|011)
-              bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
-              ;;
+            dz_mod "menus/ssh_ws_puro_menu.sh" ""
+            ;;
             *) echo "Opción inválida"; sleep 1 ;;
         esac
     done
@@ -2814,7 +2844,7 @@ RAYA="${CYAN}◆═════════════════════�
         # DARKZSAID_OP11_WS_PURO_START
         op="${op//[[:space:]]/}"
         if [[ "$op" == "11" || "$op" == "011" ]]; then
-          bash /opt/darkzsaid/menus/ssh_ws_puro_menu.sh
+          dz_mod "menus/ssh_ws_puro_menu.sh" ""
           continue
         fi
         # DARKZSAID_OP11_WS_PURO_END
@@ -2822,7 +2852,7 @@ RAYA="${CYAN}◆═════════════════════�
         case "$op" in
             1|01)
                 if [[ -f /opt/darkzsaid/menus/users_menu.sh ]]; then
-                    bash /opt/darkzsaid/menus/users_menu.sh
+                    dz_mod "menus/users_menu.sh" ""
                 elif declare -F users_menu >/dev/null; then
                     users_menu
                 elif declare -F menu_usuarios >/dev/null; then
@@ -2837,9 +2867,9 @@ RAYA="${CYAN}◆═════════════════════�
                 if declare -F menu_instaladores >/dev/null; then
                     menu_instaladores
                 elif [[ -f /opt/darkzsaid/menus/protocolos_menu_completo.sh ]]; then
-                    bash /opt/darkzsaid/menus/protocolos_menu_completo.sh
+                    dz_mod "menus/protocolos_menu_completo.sh" ""
                 elif [[ -f /opt/darkzsaid/menus/metodos_udp_menu.sh ]]; then
-                    bash /opt/darkzsaid/menus/metodos_udp_menu.sh
+                    dz_mod "menus/metodos_udp_menu.sh" ""
                 else
                     echo "No se encontró menú de protocolos."
                     read -p "ENTER..."
@@ -2865,11 +2895,11 @@ RAYA="${CYAN}◆═════════════════════�
             ;;
 
             6)
-                bash /opt/darkzsaid/menus/extras_bot_banner_checkuser.sh
+                dz_mod "menus/extras_bot_banner_checkuser.sh" ""
                 ;;
 
             7|07)
-                bash /opt/darkzsaid/menus/configurar_nombre_panel.sh 2>/dev/null || {
+                dz_mod "menus/configurar_nombre_panel.sh" "" 2>/dev/null || {
                     echo "No se encontró configurador de logo."
                     read -p "ENTER..."
                 }
@@ -2877,16 +2907,16 @@ RAYA="${CYAN}◆═════════════════════�
 
             8|08)
                 if [[ -f /opt/darkzsaid/darkzsaid-update.sh ]]; then
-                    bash /opt/darkzsaid/darkzsaid-update.sh
+                    dz_mod "darkzsaid-update.sh" ""
                 else
                     echo "Actualizador no encontrado."
                     read -p "ENTER..."
                 fi
             ;;
 
-        10) bash /opt/darkzsaid/menus/dominio_menu.sh ;;
+        10) dz_mod "menus/dominio_menu.sh" "" ;;
             9|09)
-                bash /opt/darkzsaid/menus/uninstall_darkzsaid.sh 2>/dev/null || {
+                dz_mod "menus/uninstall_darkzsaid.sh" "" 2>/dev/null || {
                     echo "Desinstalador no encontrado."
                     read -p "ENTER..."
                 }
