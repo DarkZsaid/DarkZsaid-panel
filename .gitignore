@@ -1,44 +1,36 @@
 # Backups
 *.bak
 *.bak_*
-backups_*/
-backup_*/
 *.tar.gz
 *.zip
+menus_rotos_*/
+backups_*/
+backups_clear_*/
+backup_*/
+backup_read_opcion_*/
+backup_pantalla_*/
+backup_motd_*/
 
-# Logs
+# Logs / runtime
 *.log
-logs/
 *.out
-
-# Runtime
 *.pid
 *.sock
+logs/
+tmp/
+temp/
+.cache/
 __pycache__/
 *.pyc
 
-# Archivos sensibles
-token.txt
-bot_token.txt
+# Sensibles
 .env
 config.env
 config.json
+token.txt
+bot_token.txt
 authorized_keys
 id_rsa
 id_rsa.pub
 *.key
 *.pem
-
-# Temporales
-tmp/
-temp/
-.cache/
-
-# Backups internos del panel
-menus_rotos_*/
-backups_clear_*/
-backup_read_opcion_*/
-backup_pantalla_*/
-backup_motd_*/
-*.bak_*
-*.bak

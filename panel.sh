@@ -119,7 +119,7 @@ echo -e "${RESET}"
         echo -e "${CYAN} ◈${RESET} ${CYAN}Up:${RESET} ${BLANCO}${UPTIME_INFO}${RESET}"
 
     [[ -n "$PUERTO_SSH" ]] && echo -e "${CYAN} ◈${RESET} SSH:22 ${CYAN}◆${RESET} $PUERTO_SSH        ${CYAN}◈${RESET} DNS:53 ${CYAN}◆${RESET} ${PUERTO_DNS:-${ROJO}OFF${RESET}}"
-    [[ -n "$PUERTO_SOCKS" ]] && echo -e "${CYAN} ◈${RESET} SOCKS:80 ${CYAN}◆${RESET} $PUERTO_SOCKS"
+    [[ -n "$PUERTO_SOCKS" ]] && echo -e "${CYAN} ◈${RESET} ${WS_PURO_LABEL} ${CYAN}◆${RESET} $PUERTO_SOCKS"
     [[ -n "$PUERTO_SSL" ]] && echo -e "${CYAN} ◈${RESET} SSL:443 ${CYAN}◆${RESET} $PUERTO_SSL"
     [[ -n "$PUERTO_UDP_CUSTOM" ]] && echo -e "${CYAN} ◈${RESET} UDP:36712 ${CYAN}◆${RESET} $PUERTO_UDP_CUSTOM"
     [[ -n "$PUERTO_ZIVPN" ]] && echo -e "${CYAN} ◈${RESET} ZIVPN:5667 ${CYAN}◆${RESET} $PUERTO_ZIVPN"
@@ -2720,7 +2720,14 @@ RAYA="${CYAN}◆═════════════════════�
         fi
 
         if puerto_activo 80; then
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SOCKS:80${RESET} ${CYAN}◆ ON${RESET}")
+            # DARKZSAID_WS_PORTS_TOP_START
+            WS_PURO_PORTS=""
+            for _ws_p in 80 90 8080 8082 8084 8086; do
+                ss -tulnp 2>/dev/null | grep -q ":${_ws_p} " && WS_PURO_PORTS="${WS_PURO_PORTS:+$WS_PURO_PORTS,}${_ws_p}"
+            done
+            [ -n "$WS_PURO_PORTS" ] && WS_PURO_LABEL="SOCKS:${WS_PURO_PORTS}" || WS_PURO_LABEL="SOCKS:OFF"
+            # DARKZSAID_WS_PORTS_TOP_END
+            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}${WS_PURO_LABEL}${RESET} ${CYAN}◆ ON${RESET}")
         fi
 
         if puerto_activo 443; then
@@ -2777,25 +2784,24 @@ RAYA="${CYAN}◆═════════════════════�
         echo -e "$RAYA"
 
         printf "%b
-" "${BLANCO}<1>${RESET} ⚡ ${BLANCO}USUARIOS${RESET}          ${BLANCO}<2>${RESET} 📡 ${BLANCO}PROTOCOLOS${RESET}"
+" "${ROJO}[01]${RESET} ⚡ ${BLANCO}USUARIOS${RESET}          ${ROJO}[02]${RESET} 📡 ${BLANCO}PROTOCOLOS${RESET}"
         printf "%b
-" "${BLANCO}<3>${RESET} 🛠  ${BLANCO}HERRAMIENTAS${RESET}    ${BLANCO}<5>${RESET} ✚ ${BLANCO}PUERTOS${RESET}"
+" "${ROJO}[03]${RESET} 🛠  ${BLANCO}HERRAMIENTAS${RESET}    ${ROJO}[05]${RESET} ✚ ${BLANCO}PUERTOS${RESET}"
         printf "%b
-" "${BLANCO}<6>${RESET} ◆  ${BLANCO}EXTRAS BOT${RESET}    ${BLANCO}<7>${RESET} ⚙ ${BLANCO}LOGO SUPERIOR${RESET}"
-    printf "%b\n" " ${BLANCO}<10>${RESET} 🌐 ${AZUL}DOMINIO${RESET}"
-    printf "%b\n" " ${BLANCO}<11>${RESET} ${VERDE}SSH WS PURO${RESET}"
+" "${ROJO}[06]${RESET} ◆  ${BLANCO}EXTRAS BOT${RESET}    ${ROJO}[07]${RESET} ⚙ ${BLANCO}LOGO SUPERIOR${RESET}"
+    printf "%b\n" " ${ROJO}[10]${RESET} 🌐 ${AZUL}DOMINIO${RESET}        ${ROJO}[11]${RESET} ${CYAN}SSH WS PURO${RESET}"
         printf "%b
 " "${CYAN} ◈ Version: ${CYAN}${PANEL_VERSION}${RESET} ${CYAN}◈${RESET}"
         echo -e "$RAYA"
 
         printf "%b
-" "${BLANCO}<08>${RESET} 💻 ${AMARILLO}ACTUALIZAR${RESET}      ${BLANCO}<9>${RESET} 🗑 ${ROJO}DESINSTALAR${RESET}"
+" "${ROJO}[08]${RESET} 💻 ${AMARILLO}ACTUALIZAR${RESET}      ${ROJO}[09]${RESET} 🗑 ${ROJO}DESINSTALAR${RESET}"
         printf "%b
-" "${BLANCO}<99>${RESET} 🔄 ${AMARILLO}REBOOT${RESET}"
+" "${ROJO}[99]${RESET} 🔄 ${AMARILLO}REBOOT${RESET}"
         echo -e "$RAYA"
 
         printf "%b
-" "${BLANCO}<0>${RESET} ❌ ${ROJO}SALIR${RESET}"
+" "${ROJO}[00]${RESET} ❌ ${ROJO}SALIR${RESET}"
         echo -e "$RAYA"
         echo ""
 

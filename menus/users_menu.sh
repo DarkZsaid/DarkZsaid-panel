@@ -678,76 +678,71 @@ menu_agregar_usuario() {
 listar_usuarios() {
     limpiar_pantalla
 
-    echo -e "${CYAN}======>>> 🐲 DarkZsaid 💥 Plus 🐲 <<<======${RESET}"
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-    echo -e "🔐 ${BLANCO}ADMINISTRADOR DE USUARIOS SSH|SSL|DROPBEAR${RESET} 🔐"
-    echo -e "${CYAN}   ▸ M LIBRE: $(free -m | awk '/Mem:/ {print $4"M"}')   ▸ USO DE CPU: $(top -bn1 | grep 'Cpu' | awk '{print int($2)}')%${RESET}"
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-    echo ""
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-    printf "${CYAN}%-13s %-18s %-10s %-13s %-8s${RESET}\n" "➜ USUARIO" "CONTRASEÑA" "LIMITE" "CADUCA" "DIAS"
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+    echo -e "${CYAN}====================================================${RESET}"
+    echo -e "${BLANCO}                 CLIENTES DARKZSAID                 ${RESET}"
+    echo -e "${CYAN}====================================================${RESET}"
+    echo
+    echo -e "${CYAN}Memoria libre:${RESET} ${VERDE}$(free -m | awk '/Mem:/ {print $4"M"}')${RESET}   ${CYAN}CPU:${RESET} ${VERDE}$(top -bn1 | grep 'Cpu' | awk '{print int($2)}')%${RESET}"
+    echo
+    echo -e "${AMARILLO}----------------------------------------------------${RESET}"
+    printf "${CYAN}%-5s %-14s %-14s %-10s %-8s${RESET}
+" "N" "USUARIO" "CONTRASEÑA" "LIMITE" "CADUCA"
+    echo -e "${AMARILLO}----------------------------------------------------${RESET}"
 
     total=0
     n=1
-    tk=1
 
-    # Usuarios normales / HWID
     if [[ -s "$USER_DB" ]]; then
-        while IFS='|' read -r usuario pass tipo limite dias expira; do
+        while IFS='|' read -r usuario clave fecha limite tipo nombre creado; do
             [[ -z "$usuario" ]] && continue
 
             total=$((total+1))
 
-            if [[ "$tipo" == TOKEN* || "$tipo" == "TK"* ]]; then
-                etiqueta="TK$tk"
-                tk=$((tk+1))
+            [[ -z "$clave" ]] && clave="-"
+            [[ -z "$limite" ]] && limite="NORMAL"
 
-                printf "${ROJO}[%s]>${RESET} %-10s ${MAGENTA:-\e[35m}%-16s${RESET} %-10s %-13s ${CYAN}%-8s${RESET}\n" \
-                "$n" "" "$etiqueta" "${limite:-1}" "$expira" "$dias"
+            dias="$(dias_restantes "$fecha" 2>/dev/null)"
+            [[ -z "$dias" ]] && dias="$fecha"
+            [[ -z "$dias" ]] && dias="-"
 
-                echo -e "     ${CYAN}↳${RESET} ${VERDE}$usuario${RESET}"
-            else
-                printf "${ROJO}[%s]>${RESET} ${BLANCO}%-10s${RESET} ${BLANCO}%-16s${RESET} ${MAGENTA:-\e[35m}%-10s${RESET} ${BLANCO}%-13s${RESET} ${CYAN}%-8s${RESET}\n" \
-                "$n" "$usuario" "$pass" "${limite:-1}" "$expira" "$dias"
-            fi
+            printf "${ROJO}[%02d]${RESET} %-14s ${AMARILLO}%-14s${RESET} ${CYAN}%-10s${RESET} ${VERDE}%-8s${RESET}
+" \
+                "$n" "$usuario" "$clave" "$limite" "$dias"
 
             n=$((n+1))
         done < "$USER_DB"
     fi
 
-    # Tokens guardados aparte
     if [[ -s "$TOKEN_DB" ]]; then
-        while IFS='|' read -r TOKEN dias expira; do
-            [[ -z "$usuario" ]] && continue
+        while IFS='|' read -r token dias expira extra; do
+            [[ -z "$token" ]] && continue
 
             total=$((total+1))
-            etiqueta="TK$tk"
-            tk=$((tk+1))
+            etiqueta="TOKEN$n"
 
-            printf "${ROJO}[%s]>${RESET} %-10s ${MAGENTA:-\e[35m}%-16s${RESET} %-10s %-13s ${CYAN}%-8s${RESET}\n" \
-            "$n" "" "$etiqueta" "1" "$expira" "$dias"
+            [[ -z "$dias" ]] && dias="-"
+            [[ -z "$expira" ]] && expira="-"
 
-            echo -e "     ${CYAN}↳${RESET} ${VERDE}$usuario${RESET}"
-            echo -e "       ${AMARILLO}Token:${RESET} ${BLANCO}$token${RESET}"
+            printf "${ROJO}[%02d]${RESET} %-14s ${AMARILLO}%-14s${RESET} ${CYAN}%-10s${RESET} ${VERDE}%-8s${RESET}
+" \
+                "$n" "$etiqueta" "$token" "TOKEN" "$expira"
 
             n=$((n+1))
         done < "$TOKEN_DB"
     fi
 
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-
+    echo -e "${AMARILLO}----------------------------------------------------${RESET}"
+    echo
     if [[ "$total" -eq 0 ]]; then
-        echo -e "🛡️ # TIENES  [ ${ROJO}0${RESET} ] CLIENTES EN TU SERVIDOR 🛡️ #"
+        echo -e "${ROJO}TOTAL CLIENTES: 0${RESET}"
     else
-        echo -e "🛡️ # TIENES  [ ${VERDE}$total${RESET} ] CLIENTES EN TU SERVIDOR 🛡️ #"
+        echo -e "${VERDE}TOTAL CLIENTES: $total${RESET}"
     fi
-
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+    echo
+    echo -e "${CYAN}====================================================${RESET}"
 
     pausa_local
 }
-
 
 eliminar_un_usuario() {
     titulo_users "ELIMINAR 1 USUARIO"

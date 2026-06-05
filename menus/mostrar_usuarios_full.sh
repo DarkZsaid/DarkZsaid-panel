@@ -20,13 +20,14 @@ DB="/opt/darkzsaid/data/usuarios_ssh.db"
 limpiar_pantalla
 echo -e "======>>> 🐉 ${CYAN}DarkZsaid${RESET} 💥 ${ROJO}Plus${RESET} 🐉 <<<======"
 echo ""
-echo -e "${AMARILLO}🔐 ADMINISTRADOR DE USUARIOS SSH|SSL|DROPBEAR 🔐${RESET}"
+echo -e "${BLANCO}          CLIENTES DARKZSAID SSH          ${RESET}"
 echo -e "${AZUL}  ▸ M LIBRE:${RESET} $(free -m | awk '/Mem:/ {print $7"M"}') ${AZUL}  ▸ USO DE CPU:${RESET} $(top -bn1 | awk -F'id,' '/Cpu/ {split($1,a,","); print 100-a[length(a)]"%"}' 2>/dev/null)"
 echo ""
-echo -e "${AMARILLO}────────────────────────────────────────────${RESET}"
+echo -e "${AMARILLO}──────────────────────────────────────────────${RESET}"
 echo ""
-echo -e "${AZUL}➜   USUARIO        CONTRASEÑA        LIMITE        CADUCA${RESET}"
-echo -e "${AMARILLO}────────────────────────────────────────────${RESET}"
+printf "${AZUL}%-5s %-12s %-12s %-8s %-6s${RESET}
+" "N" "USUARIO" "CLAVE" "LIMITE" "DIAS"
+echo -e "${AMARILLO}──────────────────────────────────────────────${RESET}"
 
 python3 <<'PY'
 import os
@@ -207,12 +208,12 @@ for i, usuario in enumerate(sorted(usuarios.keys()), start=1):
     else:
         caduca = "-"
 
-    print(f"{ROJO}[{i}]{RESET}> {BLANCO}{usuario:<14}{RESET} {AMARILLO}{clave:<16}{RESET} {CYAN}{limite:<8}{RESET} {caduca}")
+    print(f"{ROJO}[{i:02d}]{RESET} {BLANCO}{usuario[:12]:<12}{RESET} {AMARILLO}{clave[:12]:<12}{RESET} {CYAN}{limite[:8]:<8}{RESET} {caduca}")
     total += 1
 
-print(f"\n🛡️ # TIENES  [ {VERDE}{total}{RESET} ] CLIENTES EN TU SERVIDOR 🛡️ #")
+print(f"\n️ # TIENES  [ {VERDE}{total}{RESET} ] CLIENTES EN TU SERVIDOR ️ #")
 PY
 
-echo -e "${AMARILLO}────────────────────────────────────────────${RESET}"
+echo -e "${AMARILLO}──────────────────────────────────────────────${RESET}"
 echo ""
 read -p "Presiona ENTER para continuar..."
