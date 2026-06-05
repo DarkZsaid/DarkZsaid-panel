@@ -38,3 +38,7 @@ id_rsa.pub
 # Runtime backups - no subir a GitHub
 backup_runtime/
 backup_runtime/**
+
+# Cache temporal del loader GitHub
+cache_github/
+cache_github/**
