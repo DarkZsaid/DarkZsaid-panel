@@ -4,54 +4,277 @@ set +e
 
 REPO_URL="https://github.com/DarkZsaid/DarkZsaid-panel.git"
 INSTALL_DIR="/opt/darkzsaid"
+LOGFILE="/tmp/darkzsaid_install.log"
 
-echo "=============================================="
-echo "        INSTALADOR PUBLICO DARKZSAID"
-echo "=============================================="
-echo
+ROJO="\033[1;31m"
+VERDE="\033[1;32m"
+AMARILLO="\033[1;33m"
+AZUL="\033[1;34m"
+MORADO="\033[1;35m"
+CYAN="\033[1;36m"
+BLANCO="\033[1;97m"
+RESET="\033[0m"
+
+clear
+
+rm -f "$LOGFILE"
+touch "$LOGFILE"
+
+banner() {
+  clear
+  echo -e "${CYAN}╔══════════════════════════════════════════════╗${RESET}"
+  echo -e "${CYAN}║${RESET}      ${BLANCO}⚡ DARKZSAID PREMIUM INSTALLER ⚡${RESET}     ${CYAN}║${RESET}"
+  echo -e "${CYAN}╚══════════════════════════════════════════════╝${RESET}"
+  echo
+  echo -e "${MORADO}        VPN / SSH / WS / UDP PANEL${RESET}"
+  echo -e "${AZUL}        Instalación limpia y estable${RESET}"
+  echo
+}
+
+barra() {
+  local pct="$1"
+  local msg="$2"
+  local total=20
+  local filled=$((pct * total / 100))
+  local empty=$((total - filled))
+  local bar=""
+
+  for ((i=0; i<filled; i++)); do bar="${bar}█"; done
+  for ((i=0; i<empty; i++)); do bar="${bar}░"; done
+
+  echo -ne "${CYAN}[${bar}]${RESET} ${VERDE}${pct}%${RESET} ${BLANCO}${msg}${RESET}\r"
+  sleep 1
+  echo
+}
+
+paso() {
+  echo
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+  echo -e "${BLANCO}$1${RESET}"
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+  sleep 1
+}
+
+ok() {
+  echo -e "${VERDE}✔ $1${RESET}"
+  sleep 0.5
+}
+
+warn() {
+  echo -e "${AMARILLO}⚠ $1${RESET}"
+  sleep 0.5
+}
+
+fail() {
+  echo
+  echo -e "${ROJO}✘ Error:${RESET} $1"
+  echo -e "${AMARILLO}Revisa el log:${RESET} $LOGFILE"
+  echo
+  exit 1
+}
+
+run_silent() {
+  local desc="$1"
+  shift
+
+  echo -e "${AZUL}• ${desc}...${RESET}"
+  "$@" >> "$LOGFILE" 2>&1
+  local code=$?
+
+  if [[ "$code" -eq 0 ]]; then
+    ok "$desc"
+  else
+    fail "$desc"
+  fi
+}
+
+run_warn() {
+  local desc="$1"
+  shift
+
+  echo -e "${AZUL}• ${desc}...${RESET}"
+  "$@" >> "$LOGFILE" 2>&1
+  local code=$?
+
+  if [[ "$code" -eq 0 ]]; then
+    ok "$desc"
+  else
+    warn "$desc tuvo avisos, continuando"
+  fi
+}
 
 if [[ "$(id -u)" != "0" ]]; then
   echo "Ejecute como root."
   exit 1
 fi
 
+banner
+
+echo -e "${BLANCO}Este instalador preparará tu VPS para DarkZsaid.${RESET}"
+echo -e "${AMARILLO}La instalación será más pausada para evitar errores en VPS nuevas.${RESET}"
+echo
+sleep 2
+
+barra 5 "Iniciando instalación"
+
+paso "[01/10] Dominio opcional"
+
+echo -e "${BLANCO}Puedes enlazar un dominio ahora.${RESET}"
+echo -e "${AMARILLO}Si no tienes dominio, presiona ENTER y seguirá normal.${RESET}"
+echo
+read -rp "Dominio para esta VPS [opcional]: " DOMINIO_INPUT
+
+DOMINIO_INPUT="$(echo "$DOMINIO_INPUT" | tr -d ' ' | tr -d '\r')"
+
+if [[ -n "$DOMINIO_INPUT" ]]; then
+  echo "$DOMINIO_INPUT" > /tmp/darkzsaid_dominio_instalacion.txt
+  ok "Dominio recibido: $DOMINIO_INPUT"
+else
+  rm -f /tmp/darkzsaid_dominio_instalacion.txt 2>/dev/null
+  warn "Instalación sin dominio inicial"
+fi
+
+barra 10 "Dominio procesado"
+
 export DEBIAN_FRONTEND=noninteractive
 
-echo "[1/6] Instalando dependencias mínimas..."
-apt update -y
-apt install -y git curl wget bash python3 sudo tar gzip ca-certificates dos2unix
+paso "[02/10] Preparando repositorios Ubuntu"
+run_warn "Actualizando lista de paquetes" apt update -y
 
-echo "[2/6] Preparando carpeta..."
-mkdir -p "$INSTALL_DIR"
+barra 20 "Sistema preparado"
+
+paso "[03/10] Instalando dependencias principales"
+run_silent "Instalando paquetes base" apt install -y \
+  git curl wget bash sudo python3 python3-pip python3-venv \
+  tar gzip unzip zip ca-certificates dos2unix rsync \
+  net-tools iproute2 iptables lsof cron procps psmisc \
+  openssl screen tmux jq bc socat
+
+barra 35 "Dependencias instaladas"
+
+paso "[04/10] Preparando carpeta DarkZsaid"
+mkdir -p "$INSTALL_DIR" >> "$LOGFILE" 2>&1 || fail "No se pudo crear $INSTALL_DIR"
+ok "Carpeta lista: $INSTALL_DIR"
+
+barra 45 "Carpeta preparada"
 
 if [[ -d "$INSTALL_DIR/.git" ]]; then
-  echo "[3/6] Actualizando repo existente..."
-  cd "$INSTALL_DIR" || exit 1
-  git pull || true
+  paso "[05/10] Actualizando repositorio existente"
+  cd "$INSTALL_DIR" || fail "No se pudo entrar a $INSTALL_DIR"
+  run_warn "Actualizando DarkZsaid desde GitHub" git pull
 else
-  echo "[3/6] Clonando repo..."
-  rm -rf "$INSTALL_DIR.tmp"
-  git clone "$REPO_URL" "$INSTALL_DIR.tmp" || exit 1
-  rsync -a "$INSTALL_DIR.tmp/" "$INSTALL_DIR/" 2>/dev/null || cp -a "$INSTALL_DIR.tmp/." "$INSTALL_DIR/"
-  rm -rf "$INSTALL_DIR.tmp"
+  paso "[05/10] Descargando panel desde GitHub"
+  rm -rf "$INSTALL_DIR.tmp" >> "$LOGFILE" 2>&1
+  run_silent "Clonando repositorio DarkZsaid" git clone "$REPO_URL" "$INSTALL_DIR.tmp"
+
+  echo -e "${AZUL}• Copiando archivos del panel...${RESET}"
+  rsync -a "$INSTALL_DIR.tmp/" "$INSTALL_DIR/" >> "$LOGFILE" 2>&1 || cp -a "$INSTALL_DIR.tmp/." "$INSTALL_DIR/" >> "$LOGFILE" 2>&1
+  rm -rf "$INSTALL_DIR.tmp" >> "$LOGFILE" 2>&1
+  ok "Archivos copiados"
 fi
 
-cd "$INSTALL_DIR" || exit 1
+cd "$INSTALL_DIR" || fail "No se pudo entrar a $INSTALL_DIR"
 
-echo "[4/6] Ejecutando preparador VPS..."
+barra 55 "Panel descargado"
+
+paso "[06/10] Guardando configuración inicial"
+
+mkdir -p "$INSTALL_DIR/data" "$INSTALL_DIR/logs" "$INSTALL_DIR/cache_github" >> "$LOGFILE" 2>&1
+
+if [[ -s /tmp/darkzsaid_dominio_instalacion.txt ]]; then
+  DOMINIO_FINAL="$(cat /tmp/darkzsaid_dominio_instalacion.txt | head -1 | tr -d ' ' | tr -d '\r')"
+
+  if [[ -n "$DOMINIO_FINAL" ]]; then
+    echo "$DOMINIO_FINAL" > "$INSTALL_DIR/dominio.txt"
+    echo "$DOMINIO_FINAL" > "$INSTALL_DIR/domain.txt"
+    echo "$DOMINIO_FINAL" > "$INSTALL_DIR/domain.conf"
+    echo "$DOMINIO_FINAL" > "$INSTALL_DIR/data/dominio.txt"
+    ok "Dominio guardado: $DOMINIO_FINAL"
+  fi
+else
+  warn "Dominio no configurado"
+fi
+
+barra 65 "Configuración guardada"
+
+paso "[07/10] Preparador interno de VPS"
+
 if [[ -x "$INSTALL_DIR/core/preparar_vps.sh" ]]; then
-  bash "$INSTALL_DIR/core/preparar_vps.sh"
+  echo -e "${AZUL}• Ejecutando preparador DarkZsaid...${RESET}"
+  bash "$INSTALL_DIR/core/preparar_vps.sh" >> "$LOGFILE" 2>&1
+  if [[ "$?" -eq 0 ]]; then
+    ok "Preparador ejecutado"
+  else
+    warn "Preparador terminó con avisos, continuando"
+  fi
+else
+  warn "No se encontró core/preparar_vps.sh"
 fi
 
-echo "[5/6] Permisos..."
-find "$INSTALL_DIR" -type f -name "*.sh" -exec chmod +x {} \;
-chmod +x "$INSTALL_DIR/panel.sh" 2>/dev/null || true
+barra 75 "VPS preparada"
 
-echo "[6/6] Creando comandos menu/darkzsaid..."
-cp -f "$INSTALL_DIR/panel.sh" /usr/local/bin/menu 2>/dev/null || true
-cp -f "$INSTALL_DIR/panel.sh" /usr/local/bin/darkzsaid 2>/dev/null || true
-chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid 2>/dev/null || true
+paso "[08/10] Permisos y comandos"
+
+echo -e "${AZUL}• Aplicando permisos...${RESET}"
+find "$INSTALL_DIR" -type f -name "*.sh" -exec chmod +x {} \; >> "$LOGFILE" 2>&1
+chmod +x "$INSTALL_DIR/panel.sh" >> "$LOGFILE" 2>&1 || true
+chmod +x "$INSTALL_DIR/core/"*.sh >> "$LOGFILE" 2>&1 || true
+chmod +x "$INSTALL_DIR/menus/"*.sh >> "$LOGFILE" 2>&1 || true
+ok "Permisos aplicados"
+
+echo -e "${AZUL}• Creando comandos globales...${RESET}"
+ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/menu >> "$LOGFILE" 2>&1
+ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1
+chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1 || true
+ok "Comandos creados: menu / darkzsaid"
+
+barra 85 "Comandos listos"
+
+paso "[09/10] Verificación final"
+
+bash -n "$INSTALL_DIR/panel.sh" >> "$LOGFILE" 2>&1 || fail "panel.sh tiene error de sintaxis"
+
+if [[ -f "$INSTALL_DIR/core/github_loader.sh" ]]; then
+  bash -n "$INSTALL_DIR/core/github_loader.sh" >> "$LOGFILE" 2>&1 || fail "github_loader.sh tiene error de sintaxis"
+fi
+
+if [[ -f "$INSTALL_DIR/core/preparar_vps.sh" ]]; then
+  bash -n "$INSTALL_DIR/core/preparar_vps.sh" >> "$LOGFILE" 2>&1 || fail "preparar_vps.sh tiene error de sintaxis"
+fi
+
+if [[ -f "$INSTALL_DIR/install-public.sh" ]]; then
+  bash -n "$INSTALL_DIR/install-public.sh" >> "$LOGFILE" 2>&1 || fail "install-public.sh tiene error de sintaxis"
+fi
+
+ok "Sintaxis correcta"
+
+barra 95 "Verificación completada"
+
+paso "[10/10] Finalizando instalación"
+
+rm -f /tmp/darkzsaid_dominio_instalacion.txt >> "$LOGFILE" 2>&1
+hash -r 2>/dev/null || true
+
+barra 100 "Instalación completada"
 
 echo
-echo "Instalación terminada."
-echo "Use: menu"
+echo -e "${CYAN}╔══════════════════════════════════════════════╗${RESET}"
+echo -e "${CYAN}║${RESET}        ${VERDE}DARKZSAID INSTALADO CORRECTAMENTE${RESET}       ${CYAN}║${RESET}"
+echo -e "${CYAN}╚══════════════════════════════════════════════╝${RESET}"
+echo
+
+if [[ -s "$INSTALL_DIR/dominio.txt" ]]; then
+  echo -e "${BLANCO}Dominio:${RESET} ${VERDE}$(cat "$INSTALL_DIR/dominio.txt")${RESET}"
+else
+  echo -e "${BLANCO}Dominio:${RESET} ${AMARILLO}No configurado${RESET}"
+fi
+
+echo -e "${BLANCO}Panel:${RESET} ${VERDE}$INSTALL_DIR${RESET}"
+echo -e "${BLANCO}Log instalación:${RESET} ${AMARILLO}$LOGFILE${RESET}"
+echo
+echo -e "${BLANCO}Para abrir el panel escribe:${RESET}"
+echo -e "${VERDE}menu${RESET}"
+echo -e "${VERDE}darkzsaid${RESET}"
+echo
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+echo
