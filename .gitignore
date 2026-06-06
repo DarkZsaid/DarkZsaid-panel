@@ -1,215 +1,79 @@
+
 # Backups
+# Cache temporal del loader GitHub
+# Clientes / bases / tokens locales
+# Config local de cada VPS - no subir
+# Configs privadas generadas en cada VPS
+# DarkZsaid runtime/local - no subir a GitHub
+# Logs / runtime
+# No subir archivos temporales
+# Runtime backups - no subir a GitHub
+# Runtime local - no subir a GitHub
+# Runtime local / clientes / basura VPS
+# Sensibles
 *.bak
 *.bak_*
-*.tar.gz
-*.zip
-menus_rotos_*/
-backups_*/
-backups_clear_*/
-backup_*/
-backup_read_opcion_*/
-backup_pantalla_*/
-backup_motd_*/
-
-# Logs / runtime
+*.db
+*.key
 *.log
 *.out
+*.pem
 *.pid
-*.sock
-logs/
-tmp/
-temp/
-.cache/
-__pycache__/
 *.pyc
-
-# Sensibles
+*.sock
+*.sqlite
+*.sqlite3
+*.tar.gz
+*.zip
+.cache/
+.darkzsaid_installed
 .env
+/etc/udpmod/
+/etc/zivpn/
+__pycache__/
+authorized_keys
+backup_*
+backup_*/
+backup_motd_*/
+backup_pantalla_*/
+backup_read_opcion_*/
+backup_runtime/
+backup_runtime/**
+backups_*
+backups_*/
+backups_clear_*/
+bot_token.txt
+cache_github/
+cache_github/**
+clientes*
+clientes/
 config.env
 config.json
-token.txt
-bot_token.txt
-authorized_keys
+core/config_github.conf
+data/
+data/**
+domain.conf
+domain.txt
+dominio.txt
+etc/udpmod/
+etc/zivpn/
+hysteria_users*
 id_rsa
 id_rsa.pub
-*.key
-*.pem
-
-# Runtime backups - no subir a GitHub
-backup_runtime/
-backup_runtime/**
-
-# Cache temporal del loader GitHub
-cache_github/
-cache_github/**
-
-# Cache temporal del loader GitHub
-cache_github/
-cache_github/**
-
-# No subir archivos temporales
-cache_github/
-cache_github/**
-backup_runtime/
-backup_runtime/**
-menus_rotos_*/
-backups_*/
-backup_*/
-*.bak
-*.bak_*
-*.log
-*.tar.gz
-
-# No subir archivos temporales
-cache_github/
-cache_github/**
-backup_runtime/
-backup_runtime/**
-menus_rotos_*/
-backups_*/
-backup_*/
-*.bak
-*.bak_*
-*.log
-*.tar.gz
-
-# No subir archivos temporales
-cache_github/
-cache_github/**
-backup_runtime/
-backup_runtime/**
-menus_rotos_*/
-backups_*/
-backup_*/
-*.bak
-*.bak_*
-*.log
-*.tar.gz
-
-# Runtime local - no subir a GitHub
-data/
-data/**
 logs/
 logs/**
-cache_github/
-cache_github/**
-backup_runtime/
-backup_runtime/**
 menus_rotos_*/
-backups_*/
-backup_*/
-*.bak
-*.bak_*
-*.log
-*.tar.gz
-
-# Clientes / bases / tokens locales
-usuarios_ssh.db
-tokens_ssh.db
-usuarios_udp.db
-*.db
-*.sqlite
-*.sqlite3
-userDIR
-passwd.db
-hysteria_users*
-udp_users*
-clientes*
-
-# Runtime local - no subir a GitHub
-data/
-data/**
-logs/
-logs/**
-cache_github/
-cache_github/**
-backup_runtime/
-backup_runtime/**
-menus_rotos_*/
-backups_*/
-backup_*/
-*.bak
-*.bak_*
-*.log
-*.tar.gz
-
-# Clientes / bases / tokens locales
-usuarios_ssh.db
-tokens_ssh.db
-usuarios_udp.db
-*.db
-*.sqlite
-*.sqlite3
-userDIR
-passwd.db
-hysteria_users*
-udp_users*
-clientes*
-
-# Runtime local / clientes / basura VPS
-data/
-data/**
-logs/
-logs/**
-cache_github/
-cache_github/**
-backup_runtime/
-backup_runtime/**
-menus_rotos_*/
-backups_*/
-backup_*/
-*.bak
-*.bak_*
-*.log
-*.tar.gz
-*.db
-*.sqlite
-*.sqlite3
-usuarios_ssh.db
-tokens_ssh.db
-usuarios_udp.db
-userDIR
-clientes*
-hysteria_users*
-udp_users*
-
-# Config local de cada VPS - no subir
-domain.conf
-domain.txt
-dominio.txt
+opt/UDPMOD/*.crt
+opt/UDPMOD/*.key
 panel_logo.conf
-core/config_github.conf
-
-# DarkZsaid runtime/local - no subir a GitHub
-domain.conf
-domain.txt
-dominio.txt
-panel_logo.conf
-data/
-logs/
-cache_github/
-backup_runtime/
-backups_*
-backup_*
-*.bak
-*.bak_*
-*.log
-*.tar.gz
-clientes/
+passwd.db
+temp/
+tmp/
+token.txt
+tokens_ssh.db
+udp_users*
+userDIR
 userDIR/
 usuarios_ssh.db
+usuarios_udp.db
 usuarios_udpmod.db
-tokens_ssh.db
-
-# Configs privadas generadas en cada VPS
-/etc/udpmod/
-etc/udpmod/
-opt/UDPMOD/*.key
-opt/UDPMOD/*.crt
-/etc/zivpn/
-etc/zivpn/
-*.key
-*.pem
-authorized_keys
-id_rsa
-config.json

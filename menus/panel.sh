@@ -143,7 +143,7 @@ echo -e "${RESET}"
         
 case "$op" in
             1) bash /opt/darkzsaid/menus/users_menu.sh ;;
-            2) bash /opt/darkzsaid/menus/metodos_udp_menu.sh ;;
+            2) bash /opt/darkzsaid/menus/protocolos_github_menu.sh ;;
             3) menu_herramientas ;;
         4|04)
             echo "Opción eliminada."
@@ -2707,10 +2707,10 @@ RAYA="${CYAN}◆═════════════════════�
             2|02)
                 if declare -F menu_instaladores >/dev/null; then
                     menu_instaladores
-                elif [[ -f /opt/darkzsaid/menus/protocolos_menu_completo.sh ]]; then
-                    bash /opt/darkzsaid/menus/protocolos_menu_completo.sh
-                elif [[ -f /opt/darkzsaid/menus/metodos_udp_menu.sh ]]; then
-                    bash /opt/darkzsaid/menus/metodos_udp_menu.sh
+                elif [[ -f /opt/darkzsaid/menus/protocolos_github_menu.sh ]]; then
+                        bash /opt/darkzsaid/menus/protocolos_github_menu.sh
+                    elif [[ -f /opt/darkzsaid/menus/protocolos_menu_completo.sh ]]; then
+                        bash /opt/darkzsaid/menus/protocolos_github_menu.sh
                 else
                     echo "No se encontró menú de protocolos."
                     read -p "ENTER..."
