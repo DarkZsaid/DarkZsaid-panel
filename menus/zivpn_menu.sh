@@ -481,4 +481,41 @@ menu_zivpn() {
     done
 }
 
+# DARKZSAID_ZIVPN_INDEPENDIENTE_START
+estado_zivpn(){
+    if systemctl is-active --quiet sipvpn-activex.service 2>/dev/null || \
+       systemctl is-active --quiet zivpn.service 2>/dev/null || \
+       ss -H -ulnp 2>/dev/null | grep -q ':5667'; then
+        echo "${VERDE}[ON]${RESET}"
+    else
+        echo "${ROJO}[OFF]${RESET}"
+    fi
+}
+
+activar_zivpn(){
+    titulo_zivpn "ACTIVAR / INSTALAR ZIVPN"
+    bash /opt/darkzsaid/core/install_zivpn_motor.sh
+    echo
+    echo -e "Estado: $(estado_zivpn)"
+    read -rp "Presiona ENTER para continuar..."
+}
+
+encender_zivpn(){
+    systemctl restart sipvpn-activex.service 2>/dev/null || bash /opt/darkzsaid/core/install_zivpn_motor.sh
+    sleep 2
+    echo -e "Estado: $(estado_zivpn)"
+    read -rp "Presiona ENTER para continuar..."
+}
+
+detener_zivpn(){
+    systemctl stop sipvpn-activex.service 2>/dev/null || true
+    systemctl stop zivpn.service 2>/dev/null || true
+    pkill -f "ZiVPN|zivpn server|/usr/local/bin/zivpn" 2>/dev/null || true
+    sleep 1
+    echo -e "Estado: $(estado_zivpn)"
+    read -rp "Presiona ENTER para continuar..."
+}
+# DARKZSAID_ZIVPN_INDEPENDIENTE_END
+
+
 menu_zivpn

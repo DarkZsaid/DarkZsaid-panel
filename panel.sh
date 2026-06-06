@@ -385,7 +385,7 @@ menu_instaladores() {
 
         case "$op" in
             1|01) abrir_puertos_recomendados ;;
-            2|02) menu_appmods ;;
+            2|02) bash /opt/darkzsaid/menus/protocolos_github_menu.sh ;;
             3|03) menu_udp_custom_seguro ;;
             4|04)
                 menu_zivpn_seguro
@@ -515,7 +515,7 @@ menu_zivpn_seguro() {
     fi
 }
 
-menu_appmods() {
+bash /opt/darkzsaid/menus/protocolos_github_menu.sh() {
     while true; do
         titulo "UDP-HYSTERIA APPMOD'S / UDPMOD"
 
@@ -2894,7 +2894,7 @@ RAYA="${CYAN}◆═════════════════════�
                 if declare -F menu_instaladores >/dev/null; then
                     menu_instaladores
                 elif [[ -f /opt/darkzsaid/menus/protocolos_menu_completo.sh ]]; then
-                    dz_mod "menus/protocolos_menu_completo.sh" ""
+                    bash /opt/darkzsaid/menus/protocolos_github_menu.sh
                 elif [[ -f /opt/darkzsaid/menus/metodos_udp_menu.sh ]]; then
                     dz_mod "menus/protocolos_github_menu.sh" ""
                 else
