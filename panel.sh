@@ -124,7 +124,7 @@ mostrar_puertas_activas_panel() {
     ss -tulnp 2>/dev/null | grep -qE '(:53[[:space:]]|:53$)' && PUERTO_DNS="${VERDE}ON${RESET}"
     ss -tulnp 2>/dev/null | grep -qE '(:80[[:space:]]|:80$)' && PUERTO_SOCKS="${VERDE}ON${RESET}"
     ss -tulnp 2>/dev/null | grep -qE '(:443[[:space:]]|:443$)' && PUERTO_SSL="${VERDE}ON${RESET}"
-    ss -tulnp 2>/dev/null | grep -qE '(:36712[[:space:]]|:36712$)' && PUERTO_UDP_CUSTOM="${VERDE}ON${RESET}"
+    ss -tulnp 2>/dev/null | grep -qE '(:8081[[:space:]]|:8081$)' && PUERTO_UDP_CUSTOM="${VERDE}ON${RESET}"
     ss -tulnp 2>/dev/null | grep -qE '(:5667[[:space:]]|:5667$)' && PUERTO_ZIVPN="${VERDE}ON${RESET}"
     ss -tulnp 2>/dev/null | grep -qE '(:7200[[:space:]]|:7200$)' && PUERTO_BADVPN1="${VERDE}ON${RESET}"
     ss -tulnp 2>/dev/null | grep -qE '(:7300[[:space:]]|:7300$)' && PUERTO_BADVPN2="${VERDE}ON${RESET}"
@@ -197,7 +197,7 @@ echo -e "${RESET}"
         
 case "$op" in
             1) dz_mod "menus/users_menu.sh" "" ;;
-            2) dz_mod "menus/metodos_udp_menu.sh" "" ;;
+            2) dz_mod "menus/protocolos_github_menu.sh" "" ;;
             3) menu_herramientas ;;
         4|04)
             echo "Opción eliminada."
@@ -2896,7 +2896,7 @@ RAYA="${CYAN}◆═════════════════════�
                 elif [[ -f /opt/darkzsaid/menus/protocolos_menu_completo.sh ]]; then
                     dz_mod "menus/protocolos_menu_completo.sh" ""
                 elif [[ -f /opt/darkzsaid/menus/metodos_udp_menu.sh ]]; then
-                    dz_mod "menus/metodos_udp_menu.sh" ""
+                    dz_mod "menus/protocolos_github_menu.sh" ""
                 else
                     echo "No se encontró menú de protocolos."
                     read -p "ENTER..."
