@@ -2757,16 +2757,15 @@ RAYA="${CYAN}◆═════════════════════�
             if [[ -n "$DROPBEAR_PORTS" ]]; then
                 DROPBEAR_TOP="${DROPBEAR_PORTS} ${VERDE}ON${RESET}"
             else
-                DROPBEAR_TOP="${ROJO}OFF${RESET}"
+                DROPBEAR_TOP=""
             fi
             # DARKZSAID_DROPBEAR_TOP_END
             PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SSH:22${RESET} ${CYAN}◆ ON${RESET}")
-            PUERTOS_LINEAS+=("${CYAN} ◇${RESET} ${BLANCO}DROP:${RESET} ${DROPBEAR_TOP}")
+            [[ -n "$DROPBEAR_TOP" ]] && [[ -n "$DROPBEAR_TOP" ]] && [[ -n "$DROPBEAR_TOP" ]] && [[ -n "$DROPBEAR_TOP" ]] && PUERTOS_LINEAS+=("${CYAN} ◇${RESET} ${BLANCO}DROP:${RESET} ${DROPBEAR_TOP}")
         fi
 
         if puerto_activo 53; then
             PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}DNS:53${RESET} ${CYAN}◆ ON${RESET}")
-            PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_AFTER_DNS_FOR_WS
         fi
 
         if puerto_activo 80; then
@@ -2778,6 +2777,7 @@ RAYA="${CYAN}◆═════════════════════�
             [ -n "$WS_PURO_PORTS" ] && WS_PURO_LABEL="WS:${WS_PURO_PORTS}" || WS_PURO_LABEL="WS:OFF"
             # DARKZSAID_WS_PORTS_TOP_END
             PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}${WS_PURO_LABEL}${RESET} ${CYAN}◆ ON${RESET}")
+            PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_RIGHT_AFTER_WS
         fi
 
         if puerto_activo 443; then

@@ -148,7 +148,7 @@ run_silent "Instalando paquetes base" apt install -y \
   git curl wget bash sudo python3 python3-pip python3-venv \
   tar gzip unzip zip ca-certificates dos2unix rsync \
   net-tools iproute2 iptables lsof cron procps psmisc \
-  openssl screen tmux jq bc socat
+  openssl screen tmux jq bc socat figlet toilet figlet toilet figlet toilet
 
 barra 35 "Dependencias instaladas"
 
@@ -179,7 +179,91 @@ barra 55 "Panel descargado"
 
 paso "[06/10] Guardando configuración inicial"
 
+mkdir -p "$INSTALL_DIR/data" "$INSTALL_DIR/logs" "$INSTALL_DIR/cache_github"
+
+# DARKZSAID_CLEAN_NEW_VPS_START
+# En VPS nueva el panel debe iniciar sin clientes viejos del repositorio
 mkdir -p "$INSTALL_DIR/data" "$INSTALL_DIR/logs" "$INSTALL_DIR/cache_github" >> "$LOGFILE" 2>&1
+
+if [[ ! -f "$INSTALL_DIR/.darkzsaid_installed" ]]; then
+  rm -f "$INSTALL_DIR/data/usuarios_ssh.db" \
+        "$INSTALL_DIR/data/tokens_ssh.db" \
+        "$INSTALL_DIR/data/usuarios_udp.db" \
+        "$INSTALL_DIR/usuarios_ssh.db" \
+        "$INSTALL_DIR/tokens_ssh.db" \
+        "$INSTALL_DIR/usuarios_udp.db" >> "$LOGFILE" 2>&1
+
+  touch "$INSTALL_DIR/data/usuarios_ssh.db" >> "$LOGFILE" 2>&1
+  touch "$INSTALL_DIR/data/tokens_ssh.db" >> "$LOGFILE" 2>&1
+  touch "$INSTALL_DIR/data/usuarios_udp.db" >> "$LOGFILE" 2>&1
+fi
+
+touch "$INSTALL_DIR/.darkzsaid_installed" >> "$LOGFILE" 2>&1
+# DARKZSAID_CLEAN_NEW_VPS_END
+
+
+# DARKZSAID_CLEAN_RUNTIME_START
+mkdir -p "$INSTALL_DIR/data" "$INSTALL_DIR/logs" "$INSTALL_DIR/cache_github"
+
+# DARKZSAID_CLEAN_NEW_VPS_START
+# En VPS nueva el panel debe iniciar sin clientes viejos del repositorio
+mkdir -p "$INSTALL_DIR/data" "$INSTALL_DIR/logs" "$INSTALL_DIR/cache_github" >> "$LOGFILE" 2>&1
+
+if [[ ! -f "$INSTALL_DIR/.darkzsaid_installed" ]]; then
+  rm -f "$INSTALL_DIR/data/usuarios_ssh.db" \
+        "$INSTALL_DIR/data/tokens_ssh.db" \
+        "$INSTALL_DIR/data/usuarios_udp.db" \
+        "$INSTALL_DIR/usuarios_ssh.db" \
+        "$INSTALL_DIR/tokens_ssh.db" \
+        "$INSTALL_DIR/usuarios_udp.db" >> "$LOGFILE" 2>&1
+
+  touch "$INSTALL_DIR/data/usuarios_ssh.db" >> "$LOGFILE" 2>&1
+  touch "$INSTALL_DIR/data/tokens_ssh.db" >> "$LOGFILE" 2>&1
+  touch "$INSTALL_DIR/data/usuarios_udp.db" >> "$LOGFILE" 2>&1
+fi
+
+touch "$INSTALL_DIR/.darkzsaid_installed" >> "$LOGFILE" 2>&1
+# DARKZSAID_CLEAN_NEW_VPS_END
+ >> "$LOGFILE" 2>&1
+
+# Bases limpias: NO traer usuarios desde GitHub
+touch "$INSTALL_DIR/data/usuarios_ssh.db" >> "$LOGFILE" 2>&1
+touch "$INSTALL_DIR/data/tokens_ssh.db" >> "$LOGFILE" 2>&1
+touch "$INSTALL_DIR/data/usuarios_udp.db" >> "$LOGFILE" 2>&1
+
+# Archivos runtime locales vacíos si no existen
+[ -f /etc/adm-lite/userDIR ] || {
+  mkdir -p /etc/adm-lite >> "$LOGFILE" 2>&1
+  touch /etc/adm-lite/userDIR >> "$LOGFILE" 2>&1
+}
+
+# El repo instala el panel limpio; los clientes se crean después desde el menú/bot
+# DARKZSAID_CLEAN_RUNTIME_END
+
+
+# DARKZSAID_REAL_LOGO_CONFIG_START
+mkdir -p /etc/darkzsaid >> "$LOGFILE" 2>&1
+cat > /etc/darkzsaid/panel_logo.conf <<'LOGOCONF'
+PANEL_LOGO_TEXT="DarkZsaid"
+LOGOCONF
+chmod 644 /etc/darkzsaid/panel_logo.conf >> "$LOGFILE" 2>&1
+# DARKZSAID_REAL_LOGO_CONFIG_END
+
+
+# DARKZSAID_DEFAULT_LOGO_START
+mkdir -p "$INSTALL_DIR/backup_runtime/logo" "$INSTALL_DIR/data" >> "$LOGFILE" 2>&1
+cat > "$INSTALL_DIR/backup_runtime/logo/panel_logo.conf" <<'LOGOEOF'
+██████╗  █████╗ ██████╗ ██╗  ██╗███████╗███████╗ █████╗ ██╗██████╗
+██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝╚══███╔╝██╔════╝██╔══██╗██║██╔══██╗
+██║  ██║███████║██████╔╝█████╔╝   ███╔╝ ███████╗███████║██║██║  ██║
+██║  ██║██╔══██║██╔══██╗██╔═██╗  ███╔╝  ╚════██║██╔══██║██║██║  ██║
+██████╔╝██║  ██║██║  ██║██║  ██╗███████╗███████║██║  ██║██║██████╔╝
+╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚═════╝
+LOGOEOF
+cp -f "$INSTALL_DIR/backup_runtime/logo/panel_logo.conf" "$INSTALL_DIR/panel_logo.conf" >> "$LOGFILE" 2>&1
+cp -f "$INSTALL_DIR/backup_runtime/logo/panel_logo.conf" "$INSTALL_DIR/data/panel_logo.conf" >> "$LOGFILE" 2>&1
+# DARKZSAID_DEFAULT_LOGO_END
+ >> "$LOGFILE" 2>&1
 
 if [[ -s /tmp/darkzsaid_dominio_instalacion.txt ]]; then
   DOMINIO_FINAL="$(cat /tmp/darkzsaid_dominio_instalacion.txt | head -1 | tr -d ' ' | tr -d '\r')"
@@ -227,6 +311,27 @@ ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/menu >> "$LOGFILE" 2>&1
 ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1
 chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1 || true
 ok "Comandos creados: menu / darkzsaid"
+
+# DARKZSAID_AUTO_MENU_INSTALL_START
+# Autoabrir DarkZsaid al entrar por SSH como root
+if ! grep -q "DARKZSAID_AUTO_MENU_START" /root/.bashrc 2>/dev/null; then
+cat >> /root/.bashrc <<'BASHRCEOF'
+
+# DARKZSAID_AUTO_MENU_START
+# Abrir DarkZsaid automáticamente al entrar por SSH como root
+if [[ $- == *i* ]] && [[ -t 0 ]] && [[ -z "$DARKZSAID_AUTO_MENU_SHOWN" ]]; then
+  export DARKZSAID_AUTO_MENU_SHOWN=1
+  if [[ -x /usr/local/bin/menu ]]; then
+    /usr/local/bin/menu
+  elif [[ -x /opt/darkzsaid/panel.sh ]]; then
+    bash /opt/darkzsaid/panel.sh
+  fi
+fi
+# DARKZSAID_AUTO_MENU_END
+BASHRCEOF
+fi
+# DARKZSAID_AUTO_MENU_INSTALL_END
+
 
 barra 85 "Comandos listos"
 
