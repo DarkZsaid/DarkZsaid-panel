@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+
+limpiar_pantalla() {
+    printf '[H[2J[3J'
+    clear 2>/dev/null || true
+}
+
+
+
+
 # DARKZSAID_MODULAR_LOADER_START
 dz_mod() {
     local rel="$1"
@@ -53,7 +63,7 @@ pausa() {
 }
 
 titulo() {
-    clear
+    limpiar_pantalla
     echo -e "$LINEA"
     echo -e "${BLANCO}${BOLD}                 $1${RESET}"
     echo -e "$LINEA"
@@ -2568,7 +2578,7 @@ remover_ssh_ws_permanente() {
 }
 
 instalar_sockpython_200_establish() {
-    clear
+    limpiar_pantalla
         echo -e "$RAYA"
     echo -e "${BLANCO}${BOLD}   SOCKS PYTHON DIRECTO OS / 200 ESTABLISH ADM SJCC - 200 ESTABLISH  ${RESET}"
         echo -e "$RAYA"
@@ -2688,7 +2698,7 @@ MENU PRINCIPAL FINAL LIMPIO - DARKZSAID v1.0
 
 menu_principal() {
     while true; do
-        clear
+        limpiar_pantalla
 
         # Logo superior
         if [[ -f /etc/darkzsaid/panel_logo.conf ]]; then
@@ -2774,9 +2784,11 @@ RAYA="${CYAN}◆═════════════════════�
             for _ws_p in 80 90 8080 8082 8084 8086; do
                 ss -tulnp 2>/dev/null | grep -q ":${_ws_p} " && WS_PURO_PORTS="${WS_PURO_PORTS:+$WS_PURO_PORTS,}${_ws_p}"
             done
-            [ -n "$WS_PURO_PORTS" ] && WS_PURO_LABEL="WS:${WS_PURO_PORTS}" || WS_PURO_LABEL="WS:OFF"
+            if [[ -n "$WS_PURO_PORTS" ]]; then
+                PUERTOS_LINEAS+=("${CYAN} ◇${RESET} ${BLANCO}WS:80,90,8080${RESET}")
+                PUERTOS_LINEAS+=("${CYAN} ◇${RESET} ${BLANCO}WS:8082,8084,8086${RESET} ${CYAN}♦ ON${RESET}")
+            fi
             # DARKZSAID_WS_PORTS_TOP_END
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}${WS_PURO_LABEL}${RESET} ${CYAN}◆ ON${RESET}")
             PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_RIGHT_AFTER_WS
         fi
 
@@ -2942,7 +2954,7 @@ RAYA="${CYAN}◆═════════════════════�
             ;;
 
             0|00)
-                clear
+                limpiar_pantalla
                 exit 0
             ;;
 

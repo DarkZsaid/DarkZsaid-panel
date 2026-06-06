@@ -310,6 +310,19 @@ echo -e "${AZUL}• Creando comandos globales...${RESET}"
 ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/menu >> "$LOGFILE" 2>&1
 ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1
 chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1 || true
+
+# DARKZSAID_INSTALL_MOTORES_START
+if [[ -x "$INSTALL_DIR/core/install_udpmod_motor.sh" ]]; then
+  step "Preparando motor UDP-Hysteria / UDPMod"
+  bash "$INSTALL_DIR/core/install_udpmod_motor.sh" >> "$LOGFILE" 2>&1 || true
+fi
+
+if [[ -x "$INSTALL_DIR/core/install_zivpn_motor.sh" ]]; then
+  step "Preparando motor ZiVPN"
+  bash "$INSTALL_DIR/core/install_zivpn_motor.sh" >> "$LOGFILE" 2>&1 || true
+fi
+# DARKZSAID_INSTALL_MOTORES_END
+
 ok "Comandos creados: menu / darkzsaid"
 
 # DARKZSAID_AUTO_MENU_INSTALL_START

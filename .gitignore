@@ -179,3 +179,37 @@ domain.txt
 dominio.txt
 panel_logo.conf
 core/config_github.conf
+
+# DarkZsaid runtime/local - no subir a GitHub
+domain.conf
+domain.txt
+dominio.txt
+panel_logo.conf
+data/
+logs/
+cache_github/
+backup_runtime/
+backups_*
+backup_*
+*.bak
+*.bak_*
+*.log
+*.tar.gz
+clientes/
+userDIR/
+usuarios_ssh.db
+usuarios_udpmod.db
+tokens_ssh.db
+
+# Configs privadas generadas en cada VPS
+/etc/udpmod/
+etc/udpmod/
+opt/UDPMOD/*.key
+opt/UDPMOD/*.crt
+/etc/zivpn/
+etc/zivpn/
+*.key
+*.pem
+authorized_keys
+id_rsa
+config.json
