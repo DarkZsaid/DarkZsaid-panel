@@ -172,3 +172,10 @@ userDIR
 clientes*
 hysteria_users*
 udp_users*
+
+# Config local de cada VPS - no subir
+domain.conf
+domain.txt
+dominio.txt
+panel_logo.conf
+core/config_github.conf
