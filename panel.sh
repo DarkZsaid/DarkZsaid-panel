@@ -2746,83 +2746,103 @@ RAYA="${CYAN}◆═════════════════════�
         # Mostrar SOLO puertos activos
         PUERTOS_LINEAS=()
 
+        puerto_linea_on() {
+            local label="$1"
+            local item=""
+            printf -v item "${CYAN} ◇${RESET} ${BLANCO}%-10s${RESET} ${CYAN}✦ ON${RESET}" "$label"
+            PUERTOS_LINEAS+=("$item")
+        }
+
         puerto_activo() {
             local port="$1"
-            ss -H -tulnp 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"
+            ss -H -tulnp 2>/dev/null | grep -qE "[.:]${port}([[:space:]]|$)"
         }
 
         puerto_udp_activo() {
             local port="$1"
-            ss -H -ulnp 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"
+            ss -H -ulnp 2>/dev/null | grep -qE "[.:]${port}([[:space:]]|$)"
         }
 
-        if puerto_activo 22; then
-            # DARKZSAID_DROPBEAR_TOP_START
-            DROPBEAR_PORTS=""
-            for _dbp in 44 109 143; do
-                if ss -tulnp 2>/dev/null | grep -q ":${_dbp} " && ss -tulnp 2>/dev/null | grep ":${_dbp} " | grep -qi "dropbear"; then
-                    DROPBEAR_PORTS="${DROPBEAR_PORTS:+$DROPBEAR_PORTS,}${_dbp}"
-                fi
-            done
-            if [[ -n "$DROPBEAR_PORTS" ]]; then
-                DROPBEAR_TOP="${DROPBEAR_PORTS} ${VERDE}ON${RESET}"
-            else
-                DROPBEAR_TOP=""
-            fi
-            # DARKZSAID_DROPBEAR_TOP_END
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SSH:22${RESET} ${CYAN}◆ ON${RESET}")
-            [[ -n "$DROPBEAR_TOP" ]] && [[ -n "$DROPBEAR_TOP" ]] && [[ -n "$DROPBEAR_TOP" ]] && [[ -n "$DROPBEAR_TOP" ]] && PUERTOS_LINEAS+=("${CYAN} ◇${RESET} ${BLANCO}DROP:${RESET} ${DROPBEAR_TOP}")
-        fi
-
-        if puerto_activo 53; then
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}DNS:53${RESET} ${CYAN}◆ ON${RESET}")
-        fi
-
-    # DARKZSAID_WS_PORTS_TOP_START
-    WS_PURO_ON=0
-    for _ws_p in 90 8080 8082 8084 8086; do
-        puerto_activo "${_ws_p}" && WS_PURO_ON=1
-    done
-
-    if [[ "$WS_PURO_ON" == "1" ]]; then
-        PUERTOS_LINEAS+=("${CYAN} ✧${RESET} ${BLANCO}WS:80,90,8080${RESET}")
-        PUERTOS_LINEAS+=("${CYAN} ✧${RESET} ${BLANCO}WS:8082,8084,8086${RESET} ${CYAN}✦ ON${RESET}")
-        PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_RIGHT_AFTER_WS
-    elif systemctl is-active --quiet ssh-ws.service 2>/dev/null || puerto_activo 80; then
-        PUERTOS_LINEAS+=("${CYAN} ✧${RESET} ${BLANCO}SOCKS WS:80${RESET} ${CYAN}✦ ON${RESET}")
-        PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_RIGHT_AFTER_WS
-    fi
-    # DARKZSAID_WS_PORTS_TOP_END
-
-        if puerto_activo 443; then
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SSL:443${RESET} ${CYAN}◆ ON${RESET}")
-        fi
-
+        SSH_ON=0
+        DROPBEAR_PORTS=""
+        DNS_ON=0
+        WS_PURO_ON=0
+        SOCKS_WS_ON=0
+        SSL_ON=0
         UDP_CUSTOM_ON=0
         UDP_HYST_ON=0
+        UDP_36712_ON=0
+        ZIVPN_ON=0
+        BADVPN_ON=0
 
-        systemctl is-active --quiet udp-custom 2>/dev/null && UDP_CUSTOM_ON=1
-        systemctl is-active --quiet udpmod 2>/dev/null && UDP_HYST_ON=1
-        systemctl is-active --quiet udp-hysteria 2>/dev/null && UDP_HYST_ON=1
-
-        pgrep -af "udp-custom" >/dev/null 2>&1 && UDP_CUSTOM_ON=1
-        pgrep -af "udpmod|udp-hysteria|hysteria" >/dev/null 2>&1 && UDP_HYST_ON=1
-
-        if [[ "$UDP_CUSTOM_ON" == "1" ]]; then
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}UDP:CUSTOM${RESET} ${CYAN}◆ ON${RESET}")
-        elif [[ "$UDP_HYST_ON" == "1" ]]; then
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}UDP:HYST${RESET} ${CYAN}◆ ON${RESET}")
-        elif puerto_udp_activo 36712; then
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}UDP:36712${RESET} ${CYAN}◆ ON${RESET}")
+        if puerto_activo 22; then
+            SSH_ON=1
         fi
 
+        for _dbp in 44 109 143; do
+            if ss -tulnp 2>/dev/null | grep -q ":${_dbp} " && ss -tulnp 2>/dev/null | grep ":${_dbp} " | grep -qi "dropbear"; then
+                DROPBEAR_PORTS="${DROPBEAR_PORTS:+$DROPBEAR_PORTS,}${_dbp}"
+            fi
+        done
+
+        puerto_activo 53 && DNS_ON=1
+
+        for _ws_p in 90 8080 8082 8084 8086; do
+            puerto_activo "${_ws_p}" && WS_PURO_ON=1
+        done
+
+        if [[ "$WS_PURO_ON" != "1" ]]; then
+            if systemctl is-active --quiet ssh-ws.service 2>/dev/null; then
+                SOCKS_WS_ON=1
+            else
+                PID80="$(ss -tlnp 2>/dev/null | awk -F'pid=' '/:80 /{split($2,a,","); print a[1]; exit}')"
+                if [[ -n "$PID80" ]] && ps -fp "$PID80" 2>/dev/null | grep -q "socks-python-ws.py"; then
+                    SOCKS_WS_ON=1
+                fi
+            fi
+        fi
+
+        puerto_activo 443 && SSL_ON=1
+
+        systemctl is-active --quiet udp-custom 2>/dev/null && UDP_CUSTOM_ON=1
+        pgrep -af "udp-custom" >/dev/null 2>&1 && UDP_CUSTOM_ON=1
+
+        systemctl is-active --quiet udpmod 2>/dev/null && UDP_HYST_ON=1
+        systemctl is-active --quiet udp-hysteria 2>/dev/null && UDP_HYST_ON=1
+        pgrep -af "udpmod|udp-hysteria|hysteria" >/dev/null 2>&1 && UDP_HYST_ON=1
+
+        puerto_udp_activo 36712 && UDP_36712_ON=1
+
         if systemctl is-active --quiet zivpn 2>/dev/null || puerto_udp_activo 5667 || pgrep -af "zivpn" >/dev/null 2>&1; then
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}ZIVPN:5667${RESET} ${CYAN}◆ ON${RESET}")
+            ZIVPN_ON=1
         fi
 
         if pgrep -af "badvpn|udpgw" >/dev/null 2>&1 || puerto_activo 7300 || puerto_activo 7200; then
-            PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}BadVPN:7300${RESET} ${CYAN}◆ ON${RESET}")
+            BADVPN_ON=1
         fi
+
+        [[ "$SSH_ON" == "1" ]] && puerto_linea_on "SSH:22"
+        [[ -n "$DROPBEAR_PORTS" ]] && puerto_linea_on "DROP:${DROPBEAR_PORTS}"
+
+        if [[ "$WS_PURO_ON" == "1" ]]; then
+            puerto_linea_on "WS:80,90,8080"
+            puerto_linea_on "WS:8082,8084,8086"
+        fi
+
+        [[ "$DNS_ON" == "1" ]] && puerto_linea_on "DNS:53"
+        [[ "$SOCKS_WS_ON" == "1" ]] && puerto_linea_on "SOCKS WS:80"
+        [[ "$SSL_ON" == "1" ]] && puerto_linea_on "SSL:443"
+
+        if [[ "$UDP_CUSTOM_ON" == "1" ]]; then
+            puerto_linea_on "UDP:CUSTOM"
+        elif [[ "$UDP_HYST_ON" == "1" ]]; then
+            puerto_linea_on "UDP:HYST"
+        elif [[ "$UDP_36712_ON" == "1" ]]; then
+            puerto_linea_on "UDP:36712"
+        fi
+
+        [[ "$ZIVPN_ON" == "1" ]] && puerto_linea_on "ZIVPN:5667"
+        [[ "$BADVPN_ON" == "1" ]] && puerto_linea_on "BadVPN:7300"
 
         i=0
         total=${#PUERTOS_LINEAS[@]}
