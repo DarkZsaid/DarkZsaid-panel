@@ -96,7 +96,8 @@ barra_premium(){
         percent=$(( i * 100 / total ))
         filled=$(printf "%0.s█" $(seq 1 "$i"))
         empty=$(printf "%0.s░" $(seq 1 $((total-i))))
-        printf "${CYAN}[${VERDE}%s${AMARILLO}%s${CYAN}] ${BLANCO}%3d%%${RESET}" "$filled" "$empty" "$percent"
+        printf "
+${CYAN}[${VERDE}%s${AMARILLO}%s${CYAN}] ${BLANCO}%3d%%${RESET}" "$filled" "$empty" "$percent"
         sleep "$delay"
     done
 
@@ -346,15 +347,12 @@ ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1
 chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1 || true
 
 # DARKZSAID_INSTALL_MOTORES_START
-if [[ -x "$INSTALL_DIR/core/install_udpmod_motor.sh" ]]; then
-  step "Preparando motor UDP-Hysteria / UDPMod"
-  bash "$INSTALL_DIR/core/install_udpmod_motor.sh" >> "$LOGFILE" 2>&1 || true
-fi
-
-if [[ -x "$INSTALL_DIR/core/install_zivpn_motor.sh" ]]; then
-  step "Preparando motor ZiVPN"
-  bash "$INSTALL_DIR/core/install_zivpn_motor.sh" >> "$LOGFILE" 2>&1 || true
-fi
+# Motores independientes disponibles.
+# No se ejecutan aquí para mantener instalación limpia.
+# Cada protocolo se instala desde su opción del menú.
+for motor in "$INSTALL_DIR"/core/install_*_motor.sh; do
+    [ -f "$motor" ] && chmod +x "$motor" >> "$LOGFILE" 2>&1 || true
+done
 # DARKZSAID_INSTALL_MOTORES_END
 
 ok "Comandos creados: menu / darkzsaid"
