@@ -38,7 +38,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 $PY_FILE --listen-port 80 --local-port 22 --response 101
+ExecStart=/usr/bin/python3 $PY_FILE --listen-port 80 --local-port 22 --response 200 --banner "ADM SJCC"
 Restart=always
 RestartSec=3
 

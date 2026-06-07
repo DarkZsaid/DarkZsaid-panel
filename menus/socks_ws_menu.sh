@@ -193,16 +193,19 @@ Host: test
 
 detener_ws80() {
     titulo
-    echo -e "${AMARILLO}Deteniendo SOCKS PYTHON DIRECTO WS / 200 Establish...${RESET}"
+    echo -e "${AMARILLO}Deteniendo SOCKS PYTHON DIRECTO WS / ADM SJCC...${RESET}"
     echo ""
+
+    systemctl stop ssh-ws.service 2>/dev/null || true
+    systemctl disable ssh-ws.service 2>/dev/null || true
 
     systemctl stop darkzsaid-ws80 2>/dev/null || true
     systemctl disable darkzsaid-ws80 2>/dev/null || true
 
+    pkill -f "/opt/darkzsaid/socks-python-ws.py" 2>/dev/null || true
+    pkill -f "socks-python-ws.py" 2>/dev/null || true
     pkill -f "/opt/darkzsaid/ssh-ws-direct.py" 2>/dev/null || true
     pkill -f "ssh-ws-direct.py" 2>/dev/null || true
-    pkill -f "socks-python" 2>/dev/null || true
-    pkill -f "python.*:80" 2>/dev/null || true
 
     sleep 1
 
@@ -212,9 +215,11 @@ detener_ws80() {
         kill -9 $PID80 2>/dev/null || true
     fi
 
+    systemctl daemon-reload 2>/dev/null || true
+
     echo ""
     echo -e "${AMARILLO}Estado servicio:${RESET}"
-    systemctl is-active darkzsaid-ws80 2>/dev/null || echo "inactive"
+    systemctl is-active ssh-ws.service 2>/dev/null || echo "inactive"
 
     echo ""
     echo -e "${AMARILLO}Puerto 80:${RESET}"
