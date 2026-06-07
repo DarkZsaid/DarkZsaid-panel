@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# DARKZSAID_TERMINAL_SAFE_START
+export TERM="${TERM:-xterm-256color}"
+
+dz_terminal_reset() {
+    printf '\033[0m' 2>/dev/null || true
+    tput cnorm 2>/dev/null || true
+}
+
+trap dz_terminal_reset EXIT INT TERM
+printf '\033[0m' 2>/dev/null || true
+# DARKZSAID_TERMINAL_SAFE_END
+
+
 set +e
 
 REPO_URL="https://github.com/DarkZsaid/DarkZsaid-panel.git"
