@@ -73,6 +73,39 @@ fail() {
   exit 1
 }
 
+
+barra_premium(){
+    local texto="${1:-Preparando instalación premium}"
+    local total="${2:-34}"
+    local delay="${3:-0.035}"
+    local i percent filled empty
+
+    if [[ -z "${DZ_BARRA_TITULO_MOSTRADO:-}" ]]; then
+        export DZ_BARRA_TITULO_MOSTRADO=1
+        echo
+        echo -e "${CYAN}╔════════════════════════════════════════════╗${RESET}"
+        echo -e "${CYAN}║${RESET}      ${BLANCO}⚡ DARKZSAID INSTALLER ⚡${RESET}       ${CYAN}║${RESET}"
+        echo -e "${CYAN}╚════════════════════════════════════════════╝${RESET}"
+        echo
+    fi
+
+    echo -e "${AZUL}➜ ${BLANCO}${texto}${RESET}"
+    echo
+
+    for i in $(seq 1 "$total"); do
+        percent=$(( i * 100 / total ))
+        filled=$(printf "%0.s█" $(seq 1 "$i"))
+        empty=$(printf "%0.s░" $(seq 1 $((total-i))))
+        printf "${CYAN}[${VERDE}%s${AMARILLO}%s${CYAN}] ${BLANCO}%3d%%${RESET}" "$filled" "$empty" "$percent"
+        sleep "$delay"
+    done
+
+    echo
+    echo -e "${VERDE}✓ ${BLANCO}${texto} completado${RESET}"
+    echo
+}
+
+
 run_silent() {
   local desc="$1"
   shift
@@ -115,7 +148,7 @@ echo -e "${AMARILLO}La instalación será más pausada para evitar errores en VP
 echo
 sleep 2
 
-barra 5 "Iniciando instalación"
+barra_premium "Preparando VPS DarkZsaid Premium" 34 0.035
 
 paso "[01/10] Dominio opcional"
 
@@ -153,6 +186,7 @@ run_silent "Instalando paquetes base" apt install -y \
 barra 35 "Dependencias instaladas"
 
 paso "[04/10] Preparando carpeta DarkZsaid"
+barra_premium "Preparando carpeta DarkZsaid" 26 0.025
 mkdir -p "$INSTALL_DIR" >> "$LOGFILE" 2>&1 || fail "No se pudo crear $INSTALL_DIR"
 ok "Carpeta lista: $INSTALL_DIR"
 
