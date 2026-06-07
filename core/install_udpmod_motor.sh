@@ -99,7 +99,25 @@ iptables -t nat -C PREROUTING -p udp --dport 20000:39999 -j REDIRECT --to-ports 
 iptables -t nat -A PREROUTING -p udp --dport 20000:39999 -j REDIRECT --to-ports "$PORT" 2>/dev/null || true
 
 systemctl daemon-reload
+
+# ===== DARKZSAID EXCLUSION UDP =====
+# UDPMod/Hysteria y UDP Custom usan el mismo puerto 36712.
+# Por seguridad, al activar UDPMod se apaga UDP Custom.
+echo "➜ Apagando UDP Custom para liberar puerto 36712..."
+systemctl stop udp-custom.service >/dev/null 2>&1 || true
+pkill -f '/usr/bin/udp server' >/dev/null 2>&1 || true
+sleep 1
+
 systemctl enable udpmod.service >/dev/null 2>&1 || true
+
+# ===== DARKZSAID EXCLUSION UDP =====
+# UDPMod/Hysteria y UDP Custom usan el mismo puerto 36712.
+# Al activar UDPMod, se apaga UDP Custom para liberar el puerto.
+echo "➜ Apagando UDP Custom para liberar puerto 36712..."
+systemctl stop udp-custom.service >/dev/null 2>&1 || true
+pkill -f '/usr/bin/udp server' >/dev/null 2>&1 || true
+sleep 1
+
 systemctl restart udpmod.service
 sleep 3
 

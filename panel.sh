@@ -2778,19 +2778,21 @@ RAYA="${CYAN}◆═════════════════════�
             PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}DNS:53${RESET} ${CYAN}◆ ON${RESET}")
         fi
 
-        if puerto_activo 80; then
-            # DARKZSAID_WS_PORTS_TOP_START
-            WS_PURO_PORTS=""
-            for _ws_p in 80 90 8080 8082 8084 8086; do
-                ss -tulnp 2>/dev/null | grep -q ":${_ws_p} " && WS_PURO_PORTS="${WS_PURO_PORTS:+$WS_PURO_PORTS,}${_ws_p}"
-            done
-            if [[ -n "$WS_PURO_PORTS" ]]; then
-                PUERTOS_LINEAS+=("${CYAN} ◇${RESET} ${BLANCO}WS:80,90,8080${RESET}")
-                PUERTOS_LINEAS+=("${CYAN} ◇${RESET} ${BLANCO}WS:8082,8084,8086${RESET} ${CYAN}♦ ON${RESET}")
-            fi
-            # DARKZSAID_WS_PORTS_TOP_END
-            PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_RIGHT_AFTER_WS
-        fi
+    # DARKZSAID_WS_PORTS_TOP_START
+    WS_PURO_ON=0
+    for _ws_p in 90 8080 8082 8084 8086; do
+        puerto_activo "${_ws_p}" && WS_PURO_ON=1
+    done
+
+    if [[ "$WS_PURO_ON" == "1" ]]; then
+        PUERTOS_LINEAS+=("${CYAN} ✧${RESET} ${BLANCO}WS:80,90,8080${RESET}")
+        PUERTOS_LINEAS+=("${CYAN} ✧${RESET} ${BLANCO}WS:8082,8084,8086${RESET} ${CYAN}✦ ON${RESET}")
+        PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_RIGHT_AFTER_WS
+    elif systemctl is-active --quiet ssh-ws.service 2>/dev/null || puerto_activo 80; then
+        PUERTOS_LINEAS+=("${CYAN} ✧${RESET} ${BLANCO}SOCKS WS:80${RESET} ${CYAN}✦ ON${RESET}")
+        PUERTOS_LINEAS+=("") # DARKZSAID_BLANK_RIGHT_AFTER_WS
+    fi
+    # DARKZSAID_WS_PORTS_TOP_END
 
         if puerto_activo 443; then
             PUERTOS_LINEAS+=("${CYAN} ◈${RESET} ${BLANCO}SSL:443${RESET} ${CYAN}◆ ON${RESET}")
