@@ -357,6 +357,55 @@ done
 
 ok "Comandos creados: menu / darkzsaid"
 
+# DARKZSAID_SANITY_START
+echo -e "${AZUL}• Reparando permisos y rutas del panel...${RESET}"
+
+mkdir -p "$INSTALL_DIR/core" "$INSTALL_DIR/bin" "$INSTALL_DIR/menus" "$INSTALL_DIR/data" "$INSTALL_DIR/logs" "$INSTALL_DIR/cache_github" >> "$LOGFILE" 2>&1 || true
+
+find "$INSTALL_DIR" -type f -name "*.sh" -exec chmod +x {} \; >> "$LOGFILE" 2>&1 || true
+find "$INSTALL_DIR" -type f -name "*.py" -exec chmod +x {} \; >> "$LOGFILE" 2>&1 || true
+
+[ -d "$INSTALL_DIR/bin" ] && find "$INSTALL_DIR/bin" -type f -exec chmod +x {} \; >> "$LOGFILE" 2>&1 || true
+[ -d "$INSTALL_DIR/core" ] && find "$INSTALL_DIR/core" -type f -name "*.sh" -exec chmod +x {} \; >> "$LOGFILE" 2>&1 || true
+[ -d "$INSTALL_DIR/menus" ] && find "$INSTALL_DIR/menus" -type f -name "*.sh" -exec chmod +x {} \; >> "$LOGFILE" 2>&1 || true
+
+REQUIRED_FILES=(
+"$INSTALL_DIR/panel.sh"
+"$INSTALL_DIR/menus/socks_ws_menu.sh"
+"$INSTALL_DIR/menus/ssh_ws_puro_menu.sh"
+"$INSTALL_DIR/menus/udp_custom_menu.sh"
+"$INSTALL_DIR/core/install_socks_ws_motor.sh"
+"$INSTALL_DIR/core/install_ssh_ws_puro_motor.sh"
+"$INSTALL_DIR/core/install_udp_custom_motor.sh"
+"$INSTALL_DIR/core/install_udpmod_motor.sh"
+"$INSTALL_DIR/bin/ssh_ws_puro_start.sh"
+"$INSTALL_DIR/bin/ssh_ws_puro_stop.sh"
+"$INSTALL_DIR/bin/ssh_ws_puro_status.sh"
+)
+
+for req in "${REQUIRED_FILES[@]}"; do
+    [ -f "$req" ] || fail "Falta archivo requerido: $req"
+done
+
+for shfile in "${REQUIRED_FILES[@]}"; do
+    case "$shfile" in
+        *.sh)
+            bash -n "$shfile" >> "$LOGFILE" 2>&1 || fail "Error de sintaxis en: $shfile"
+        ;;
+    esac
+done
+
+if [ -f "$INSTALL_DIR/socks-python-ws.py" ]; then
+    python3 -m py_compile "$INSTALL_DIR/socks-python-ws.py" >> "$LOGFILE" 2>&1 || warn "socks-python-ws.py tuvo aviso de compilación"
+fi
+
+ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/menu >> "$LOGFILE" 2>&1 || true
+ln -sf "$INSTALL_DIR/panel.sh" /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1 || true
+chmod +x /usr/local/bin/menu /usr/local/bin/darkzsaid >> "$LOGFILE" 2>&1 || true
+
+ok "Permisos, rutas y sintaxis verificados"
+# DARKZSAID_SANITY_END
+
 # DARKZSAID_AUTO_MENU_INSTALL_START
 # Autoabrir DarkZsaid al entrar por SSH como root
 if ! grep -q "DARKZSAID_AUTO_MENU_START" /root/.bashrc 2>/dev/null; then
