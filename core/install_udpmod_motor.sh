@@ -25,8 +25,8 @@ PASS="DarkZsaid"
 
 info "Preparando UDPMod / Hysteria independiente..."
 
-systemctl stop udp-custom.service 2>/dev/null || true
-pkill -f "/usr/bin/udp" 2>/dev/null || true
+# DESACTIVADO PARA NO CORTAR CONEXION: systemctl stop udp-custom.service 2>/dev/null || true
+# DESACTIVADO PARA NO CORTAR CONEXION: pkill -f "/usr/bin/udp" 2>/dev/null || true
 
 mkdir -p "$BIN_DIR" "$CONF_DIR"
 
