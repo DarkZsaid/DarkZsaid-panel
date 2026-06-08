@@ -17,7 +17,18 @@ DB = DATA_DIR / "usuarios.db"
 ADMINS_DB = DATA_DIR / "admins.db"
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
-USERDIR.mkdir(parents=True, exist_ok=True)
+
+# DarkZsaid fix: si /etc/adm-lite/userDIR existe como archivo, respaldarlo y crear carpeta
+try:
+    USERDIR = pathlib.Path("/etc/adm-lite/userDIR")
+    if USERDIR.exists() and not USERDIR.is_dir():
+        backup = pathlib.Path(f"/etc/adm-lite/userDIR.bak_{int(time.time())}")
+        shutil.move(str(USERDIR), str(backup))
+    USERDIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
+
+# USERDIR mkdir ya protegido arriba
 UDP_USERS.mkdir(parents=True, exist_ok=True)
 
 def load_conf():
