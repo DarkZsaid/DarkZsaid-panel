@@ -2843,7 +2843,16 @@ RAYA="${CYAN}◆═════════════════════�
         fi
 
         [[ "$DNS_ON" == "1" ]] && puerto_linea_on "DNS:53"
-        [[ "$SOCKS_WS_ON" == "1" ]] && puerto_linea_on "SOCKS WS:80"
+        
+# DarkZsaid: detectar opcion 5 SOCKS Python Directo WS puerto 80
+SOCKS_WS_ON="0"
+if systemctl is-active --quiet darkzsaid-ws80.service 2>/dev/null || \
+   systemctl is-active --quiet ssh-ws.service 2>/dev/null || \
+   ss -tlnp 2>/dev/null | grep -qE ':80[[:space:]].*ssh-ws-direct|:80[[:space:]].*python3'; then
+    SOCKS_WS_ON="1"
+fi
+
+[[ "$SOCKS_WS_ON" == "1" ]] && puerto_linea_on "SOCKS WS:80"
         [[ "$SSL_ON" == "1" ]] && puerto_linea_on "SSL:443"
 
         if [[ "$UDP_CUSTOM_ON" == "1" ]]; then
