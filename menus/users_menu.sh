@@ -362,6 +362,13 @@ SERVICE
                 echo -e "${ROJO}CheckUser removido.${RESET}"
                 read -r -p "Presiona ENTER para continuar..."
                 ;;
+            2|02)
+                bash /opt/darkzsaid/menus/token_users_menu.sh crear
+                ;;
+            3|03)
+                bash /opt/darkzsaid/menus/token_users_menu.sh pass
+                ;;
+
 
             0|00)
                 
@@ -555,6 +562,9 @@ fecha_expira() {
 }
 
 guardar_usuario_db() {
+    bash /opt/darkzsaid/menus/agregar_usuario_menu.sh
+    return
+
     local usuario="$1"
     local pass="$2"
     local tipo="$3"
@@ -651,28 +661,86 @@ crear_token() {
     read -r -p "Presiona ENTER para continuar..."
 }
 
-menu_agregar_usuario() {
+menu_agregar_usuario_original_token_backup_original_dropbear_token_backup(){
     while true; do
-        titulo_users "AGREGAR USUARIO"
+        clear
+        if type titulo_users >/dev/null 2>&1; then
+            titulo_users "AGREGAR USUARIO"
+        else
+            echo "===== AGREGAR USUARIO ====="
+        fi
 
+        echo
         echo -e "${ROJO}[01]${RESET} ${CYAN}➜${RESET} ${BLANCO}SSH DROPBEAR${RESET}"
-        echo ""
+        echo -e "${ROJO}[02]${RESET} ${CYAN}➜${RESET} ${BLANCO}CREAR CUENTA TOKEN${RESET}"
+        echo -e "${ROJO}[03]${RESET} ${CYAN}➜${RESET} ${BLANCO}CONTRASEÑA TOKEN${RESET}"
+        echo
         echo -e "${ROJO}[00]${RESET} ${CYAN}➜${RESET} ${ROJO}[ VOLVER ]${RESET}"
-
-        leer_local op "⚡ Opción: "
+        echo
+        read -rp "⚡ Opción: " op
 
         case "$op" in
-            4|04) modificar_contrasena_token ;;
-        5|05) modificar_password_token_moc ;;
-            1|01) crear_normal ;;
-            2|02) crear_hwid ;;
-            3|03) crear_token ;;
-            4|04) modificar_password_token_moc ;;
-            0|00) return ;;
-            *) opcion_mala ;;
+            1|01)
+                bash /opt/darkzsaid/menus/creador_cuentas_tipo.sh
+                ;;
+            2|02)
+                bash /opt/darkzsaid/menus/token_users_menu.sh crear
+                ;;
+            3|03)
+                bash /opt/darkzsaid/menus/token_users_menu.sh pass
+                ;;
+            0|00)
+                return
+                ;;
+            *)
+                echo "Opción inválida"
+                sleep 1
+                ;;
         esac
     done
 }
+
+
+
+menu_agregar_usuario(){
+    while true; do
+        clear
+        if type titulo_users >/dev/null 2>&1; then
+            titulo_users "AGREGAR USUARIO"
+        else
+            echo "===== AGREGAR USUARIO ====="
+        fi
+
+        echo
+        echo -e "${ROJO}[01]${RESET} ${CYAN}➜${RESET} ${BLANCO}SSH DROPBEAR${RESET}"
+        echo -e "${ROJO}[02]${RESET} ${CYAN}➜${RESET} ${BLANCO}CREAR CUENTA TOKEN${RESET}"
+        echo -e "${ROJO}[03]${RESET} ${CYAN}➜${RESET} ${BLANCO}CONTRASEÑA TOKEN${RESET}"
+        echo
+        echo -e "${ROJO}[00]${RESET} ${CYAN}➜${RESET} ${ROJO}[ VOLVER ]${RESET}"
+        echo
+        read -rp "⚡ Opción: " op
+
+        case "$op" in
+            1|01)
+                bash /opt/darkzsaid/menus/creador_cuentas_tipo.sh
+                ;;
+            2|02)
+                bash /opt/darkzsaid/menus/token_users_menu.sh crear
+                ;;
+            3|03)
+                bash /opt/darkzsaid/menus/token_users_menu.sh pass
+                ;;
+            0|00)
+                return
+                ;;
+            *)
+                echo "Opción inválida"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
 
 
 listar_usuarios() {
@@ -1731,5 +1799,43 @@ menu_users() {
     done
 }
 
+
+# DarkZsaid TOKEN - función correcta antes de ejecutar menu_users
+menu_agregar_usuario(){
+    while true; do
+        clear
+        titulo_users "AGREGAR USUARIO"
+
+        echo
+        echo -e "${ROJO}[01]${RESET} ${CYAN}➜${RESET} ${BLANCO}SSH DROPBEAR${RESET}"
+        echo -e "${ROJO}[02]${RESET} ${CYAN}➜${RESET} ${BLANCO}CREAR CUENTA TOKEN${RESET}"
+        echo -e "${ROJO}[03]${RESET} ${CYAN}➜${RESET} ${BLANCO}CONTRASEÑA TOKEN${RESET}"
+        echo
+        echo -e "${ROJO}[00]${RESET} ${CYAN}➜${RESET} ${ROJO}[ VOLVER ]${RESET}"
+        echo
+        read -rp "⚡ Opción: " op
+
+        case "$op" in
+            1|01)
+                bash /opt/darkzsaid/menus/creador_cuentas_tipo.sh
+                ;;
+            2|02)
+                bash /opt/darkzsaid/menus/token_users_menu.sh crear
+                ;;
+            3|03)
+                bash /opt/darkzsaid/menus/token_users_menu.sh pass
+                ;;
+            0|00)
+                return
+                ;;
+            *)
+                echo "Opción inválida"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
 menu_users
+
 
