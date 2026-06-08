@@ -81,6 +81,25 @@ iptables -t nat -A PREROUTING -p udp --dport 6000:19999 -j REDIRECT --to-ports 5
 
 systemctl daemon-reload
 systemctl enable sipvpn-activex.service >/dev/null 2>&1 || true
+
+# Fix DarkZsaid: asegurar config ZiVPN valida
+mkdir -p /etc/zivpn
+cat > /etc/zivpn/config.json <<'JSON'
+{
+  "listen": ":5667",
+  "cert": "/etc/zivpn/zivpn.crt",
+  "key": "/etc/zivpn/zivpn.key",
+  "max_conn": 0,
+  "obfs": "zivpn",
+  "auth": {
+    "mode": "passwords",
+    "config": [
+      "DarkZsaid"
+    ]
+  }
+}
+JSON
+
 systemctl restart sipvpn-activex.service
 sleep 2
 
