@@ -47,10 +47,28 @@ while read -r pid etimes args; do
     total=$((total + 1))
 done < <(ps -eo pid=,etimes=,args= 2>/dev/null)
 
-# Dropbear sesiones reales: proceso hijo con -2
-dropbear_total="$(ps -eo args= 2>/dev/null | awk '/\/usr\/sbin\/dropbear/ && / -2 / {c++} END{print c+0}')"
-if [ "$dropbear_total" -gt 0 ]; then
-    dropbear_time="$(ps -eo etime=,args= 2>/dev/null | awk '/\/usr\/sbin\/dropbear/ && / -2 / {print $1; exit}')"
+# Dropbear sesiones reales
+# Detecta sesiones Dropbear con "-2" o procesos hijos reales con PPID distinto de 1.
+dropbear_info="$(ps -eo pid=,ppid=,etime=,args= 2>/dev/null | awk '
+/\/usr\/sbin\/dropbear/ {
+    ppid=$2
+    etime=$3
+    args=$0
+
+    if (args ~ / -2 / || ppid != 1) {
+        count++
+        if (first_time == "") first_time=etime
+    }
+}
+END {
+    if (count == "") count=0
+    print count "|" first_time
+}')"
+
+dropbear_total="${dropbear_info%%|*}"
+dropbear_time="${dropbear_info#*|}"
+
+if [ "$dropbear_total" -gt 0 ] 2>/dev/null; then
     [ -z "$dropbear_time" ] && dropbear_time="ACTIVO"
     printf "${VERDE}%-16s${RESET} %-14s %-12s\n" "DROPBEAR" "$dropbear_total" "$dropbear_time"
     total=$((total + dropbear_total))
