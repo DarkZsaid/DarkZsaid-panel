@@ -1627,145 +1627,8 @@ actualizar_linux_clave_final() {
 # ==========================================================
 
 usuarios_conectados() {
-    limpiar_pantalla
-
-    echo -e "${CYAN}======>>> 🐲 DarkZsaid 💥 Plus 🐲 <<<======${RESET}"
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-    echo -e "🔐 ${BLANCO}USUARIOS CONECTADOS SSH|SSL|WS${RESET} 🔐"
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-
-    echo -ne "${CYAN}PROTOCOLOS ACTIVOS:${RESET} "
-
-    ss -ltnp 2>/dev/null | grep -q ':22' && echo -ne "${VERDE}SSH:22 ${RESET}"
-    ss -ltnp 2>/dev/null | grep -q ':80' && echo -ne "${VERDE}WS:80 ${RESET}"
-    ss -ltnp 2>/dev/null | grep -q ':443' && echo -ne "${VERDE}SSL:443 ${RESET}"
-    ss -ltnp 2>/dev/null | grep -q ':442' && echo -ne "${VERDE}DROPBEAR:442 ${RESET}"
-    ss -ulnp 2>/dev/null | grep -q ':5667' && echo -ne "${VERDE}ZIVPN:5667 ${RESET}"
-
-    echo ""
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-    printf "${ROJO}%-15s %-15s %-15s${RESET}\n" "USUARIO" "CONEXIONES" "TIEMPO"
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-
-    python3 <<'PYCONN'
-import os
-import re
-import subprocess
-from pathlib import Path
-from collections import defaultdict
-
-DB = Path("/opt/darkzsaid/data/usuarios_ssh.db")
-
-limites = {}
-orden = []
-
-if DB.exists():
-    for line in DB.read_text(errors="ignore").splitlines():
-        parts = line.split("|")
-        if len(parts) >= 4 and parts[0].strip():
-            user = parts[0].strip()
-            limite = parts[3].strip() or "1"
-            limites[user] = limite
-            orden.append(user)
-
-def fmt(seconds):
-    try:
-        seconds = int(seconds)
-    except Exception:
-        seconds = 0
-    h = seconds // 3600
-    m = (seconds % 3600) // 60
-    s = seconds % 60
-    return f"{h:02d}:{m:02d}:{s:02d}"
-
-# Captura procesos sshd reales.
-# Ejemplos:
-# sshd: juan [priv]
-# sshd: juan
-# sshd: juan@pts/0
-cmd = ["ps", "-eo", "pid=,etimes=,args="]
-out = subprocess.check_output(cmd, text=True, errors="ignore")
-
-conexiones = defaultdict(int)
-tiempos = {}
-
-for line in out.splitlines():
-    if "sshd:" not in line:
-        continue
-
-    m = re.match(r"\s*(\d+)\s+(\d+)\s+(.*)$", line)
-    if not m:
-        continue
-
-    pid, etimes, args = m.groups()
-
-    muser = re.search(r"sshd:\s+([A-Za-z0-9._-]+)", args)
-    if not muser:
-        continue
-
-    user = muser.group(1)
-
-    # Ignorar root y listener
-    if user in ("root", "/usr/sbin/sshd"):
-        continue
-    if "listener" in args:
-        continue
-
-    # Evitar contar doble la misma conexión SSH.
-    # Linux crea un proceso interno tipo: sshd: usuario [priv]
-    # Ese NO es otro dispositivo, solo es proceso de privilegios.
-    if "[priv]" in args:
-        continue
-
-    # También ignoramos procesos previos a autenticación.
-    if "[preauth]" in args:
-        continue
-
-    conexiones[user] += 1
-    et = int(etimes)
-    if user not in tiempos or et > tiempos[user]:
-        tiempos[user] = et
-
-total = 0
-idx = 1
-
-# Mostrar primero usuarios de la base
-for user in orden:
-    if user.lower() == "unknown":
-        continue
-    cant = conexiones.get(user, 0)
-    if cant <= 0:
-        continue
-    limite = limites.get(user, "1")
-    tiempo = fmt(tiempos.get(user, 0))
-    print(f"\033[31m[{idx}]-{user:<11}\033[0m \033[36m[{cant}/{limite}]\033[0m          \033[32m{tiempo}\033[0m")
-    total += 1
-    idx += 1
-
-# Mostrar conectados que no estén en la base
-for user, cant in conexiones.items():
-    if user.lower() == "unknown":
-        continue
-    if user in limites:
-        continue
-    if cant <= 0:
-        continue
-    tiempo = fmt(tiempos.get(user, 0))
-    print(f"\033[31m[{idx}]-{user:<11}\033[0m \033[36m[{cant}/?]\033[0m          \033[32m{tiempo}\033[0m")
-    total += 1
-    idx += 1
-
-print("\033[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
-if total == 0:
-    print("🛡️ # TIENES  [ \033[31m0\033[0m ] USUARIOS CONECTADOS 🛡️ #")
-else:
-    print(f"🛡️ # TIENES  [ \033[32m{total}\033[0m ] USUARIOS CONECTADOS 🛡️ #")
-PYCONN
-
-    echo -e "${AMARILLO}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-    pausa_local
+    bash /opt/darkzsaid/menus/ver_conectados_ssh.sh
 }
-
 
 menu_users() {
     while true; do
@@ -1785,11 +1648,11 @@ menu_users() {
         leer_local op "⚡ Opción: "
 
         case "$op" in
-            1|01) menu_agregar_usuario ;;
+            1|01) bash /opt/darkzsaid/menus/usuarios_agregar.sh ;;
             2|02) menu_eliminar_usuarios ;;
             3|03) renovar_usuario ;;
-            4|04) bash /opt/darkzsaid/menus/mostrar_usuarios_full.sh ;;
-            5|05) usuarios_conectados ;;
+            4|04) bash /opt/darkzsaid/menus/ver_usuarios_ssh.sh ;;
+            5|05) bash /opt/darkzsaid/menus/ver_conectados_ssh.sh ;;
             6|06) backup_usuarios ;;
             7|07) restaurar_backup_usuarios ;;
                     8|08) checkuser_protocolo_menu ;;

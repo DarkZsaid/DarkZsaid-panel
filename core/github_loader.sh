@@ -31,6 +31,16 @@ run_github_panel() {
   echo "=============================================="
   echo
 
+    # DARKZSAID_USERS_MENU_LOCAL_FIRST
+    # Para users_menu.sh usamos primero el archivo local corregido.
+    if [[ "$rel" == "menus/users_menu.sh" && -f "$local_file" ]]; then
+        chmod +x "$local_file" 2>/dev/null || true
+        if bash -n "$local_file" 2>/dev/null; then
+            bash "$local_file"
+            return $?
+        fi
+    fi
+
   if command -v curl >/dev/null 2>&1; then
     curl -fsSL --connect-timeout 8 --max-time 20 "$url" -o "$cache_file.tmp" 2>/dev/null
   elif command -v wget >/dev/null 2>&1; then
